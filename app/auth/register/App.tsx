@@ -1,9 +1,7 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Mail, Lock, User, Building2, Phone, ArrowRight, Github, ToggleLeft as Google, CheckCircle2, Calendar } from 'lucide-react';
 
-export default function RegisterPage() {
+function App() {
   const [formData, setFormData] = useState({
     user_type: 'cpf',
     email: '',
@@ -432,3 +430,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+export default App;
