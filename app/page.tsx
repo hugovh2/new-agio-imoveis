@@ -8,6 +8,8 @@ import SearchFilters from "@/components/search-filters";
 import FeaturedProperties from "@/components/featured-properties";
 import HowItWorks from "@/components/how-it-works";
 import HeroCarousel from "@/components/hero-carousel";
+import StatsSection from "@/components/ui/stats-section";
+import TestimonialsSection from "@/components/ui/testimonials-section";
 
 export default function Home() {
   return (
@@ -22,11 +24,15 @@ export default function Home() {
         </div>
       </section>
 
+      <StatsSection />
+
       {/* Featured Properties */}
       <FeaturedProperties />
 
       {/* How it Works */}
       <HowItWorks />
+
+      <TestimonialsSection />
 
       {/* Latest Properties */}
       <section className="py-16 bg-gray-50">
