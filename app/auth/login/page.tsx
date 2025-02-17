@@ -1,22 +1,50 @@
 "use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, ArrowRight, Github, ToggleLeft as Google } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate loading
-    setTimeout(() => setIsLoading(false), 1500);
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        // Inclui cookies na requisição para permitir que o Laravel gerencie a sessão/CSRF
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Erro ao realizar login.");
+      }
+
+      alert(data.message || "Login realizado com sucesso!");
+      // Redireciona para a dashboard (app/anunciar/page.tsx)
+      router.push("/");
+    } catch (error: any) {
+      setErrorMessage(error.message || "Ocorreu um erro.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,6 +69,12 @@ export default function LoginPage() {
               </motion.h1>
               <p className="text-gray-600 mt-2">Entre na sua conta para continuar</p>
             </div>
+
+            {errorMessage && (
+              <div className="bg-red-100 text-red-600 border border-red-200 rounded p-2 text-sm">
+                {errorMessage}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <motion.div 
