@@ -6,6 +6,8 @@ import { Mail, Lock, ArrowRight, Github, ToggleLeft as Google } from "lucide-rea
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";  // Importando o toast e ToastContainer
+import "react-toastify/dist/ReactToastify.css"; // Importando os estilos do Toastify
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -26,7 +28,6 @@ export default function LoginPage() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        // Inclui cookies na requisição para permitir que o Laravel gerencie a sessão/CSRF
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
@@ -37,11 +38,18 @@ export default function LoginPage() {
         throw new Error(data.message || "Erro ao realizar login.");
       }
 
-      alert(data.message || "Login realizado com sucesso!");
+      // Atraso para mostrar o toast de sucesso
+      setTimeout(() => {
+        toast.success(data.message || "Login realizado com sucesso!");
+      }, 1000); // Exibe após 1 segundo de atraso
+
       // Redireciona para a dashboard (app/anunciar/page.tsx)
       router.push("/");
     } catch (error: any) {
       setErrorMessage(error.message || "Ocorreu um erro.");
+      setTimeout(() => {
+        toast.error(error.message || "Ocorreu um erro.");
+      }, 1000); // Exibe após 1 segundo de atraso
     } finally {
       setIsLoading(false);
     }
@@ -221,6 +229,9 @@ export default function LoginPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Toast container */}
+      <ToastContainer />
     </div>
   );
 }
