@@ -1,4 +1,6 @@
+// app/auth/login/page.tsx
 "use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +8,9 @@ import { Mail, Lock, ArrowRight, Github, ToggleLeft as Google } from "lucide-rea
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { toast, ToastContainer } from "react-toastify";  // Importando o toast e ToastContainer
-import "react-toastify/dist/ReactToastify.css"; // Importando os estilos do Toastify
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,12 +18,13 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
-
+  
     try {
       const response = await fetch("http://127.0.0.1:8000/api/login", {
         method: "POST",
@@ -31,29 +35,29 @@ export default function LoginPage() {
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Erro ao realizar login.");
       }
-
-      // Atraso para mostrar o toast de sucesso
-      setTimeout(() => {
-        toast.success(data.message || "Login realizado com sucesso!");
-      }, 1000); // Exibe após 1 segundo de atraso
-
-      // Redireciona para a dashboard (app/anunciar/page.tsx)
+  
+      // Salva o token no localStorage
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+  
+      login(data.user, data.token);
+  
+      toast.success("Login realizado com sucesso!");
       router.push("/");
     } catch (error: any) {
       setErrorMessage(error.message || "Ocorreu um erro.");
-      setTimeout(() => {
-        toast.error(error.message || "Ocorreu um erro.");
-      }, 1000); // Exibe após 1 segundo de atraso
+      toast.error(error.message || "Ocorreu um erro.");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#3EA76F]/5 via-white to-[#48C78E]/5">

@@ -302,6 +302,23 @@ export default function RegisterPage() {
                           />
                         </div>
                       </div>
+                      <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Telefone
+                      </label>
+                      <div className="relative group">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#3EA76F] transition-colors" />
+                        <input
+                          type="text"
+                          name="telefone"
+                          placeholder="Seu telefone"
+                          value={formData.telefone}
+                          onChange={handleChange}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3EA76F]/20 focus:border-[#3EA76F] h-12"
+                          required
+                        />
+                      </div>
+                    </div>
                     </>
                   ) : (
                     <>

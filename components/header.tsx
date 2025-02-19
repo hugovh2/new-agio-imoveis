@@ -5,10 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
+  const { user, logout } = useAuth();
 
   return (
     <header className="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b">
@@ -35,17 +37,31 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Button 
-              variant="ghost"
-              onClick={() => router.push('/auth/login')}
-            >
-              Entrar
-            </Button>
-            <Button
-              onClick={() => router.push('/auth/register')}
-            >
-              Cadastrar
-            </Button>
+            {user ? (
+              <>
+                {/* Link para a página de perfil */}
+                <Link href="/perfil">
+                  <span className="text-gray-600 cursor-pointer">Olá, {user.name}</span>
+                </Link>
+                <Button variant="ghost" onClick={logout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost"
+                  onClick={() => router.push('/auth/login')}
+                >
+                  Entrar
+                </Button>
+                <Button
+                  onClick={() => router.push('/auth/register')}
+                >
+                  Cadastrar
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -87,19 +103,37 @@ export default function Header() {
               Contato
             </Link>
             <div className="pt-2 space-y-2">
-              <Button 
-                variant="ghost" 
-                className="w-full"
-                onClick={() => router.push('/auth/login')}
-              >
-                Entrar
-              </Button>
-              <Button 
-                className="w-full"
-                onClick={() => router.push('/auth/register')}
-              >
-                Cadastrar
-              </Button>
+              {user ? (
+                <>
+                  {/* Link para a página de perfil */}
+                  <Link href="/perfil/profile">
+                    <span className="block text-gray-600 cursor-pointer">Olá, {user.name}</span>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full"
+                    onClick={logout}
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full"
+                    onClick={() => router.push('/auth/login')}
+                  >
+                    Entrar
+                  </Button>
+                  <Button 
+                    className="w-full"
+                    onClick={() => router.push('/auth/register')}
+                  >
+                    Cadastrar
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
         </div>
