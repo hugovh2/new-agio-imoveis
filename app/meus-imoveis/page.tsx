@@ -19,6 +19,7 @@ import { useAuth } from '@/context/AuthContext';
 
 interface Property {
   id: number;
+  usuario_id: number; // Added this field
   tipo_imovel: string;
   area: number;
   quartos: number;
@@ -202,7 +203,9 @@ export default function MeusImoveisPage() {
         });
         if (res.ok) {
           const data = await res.json();
-          setProperties(data);
+          // Filter properties to show only those belonging to the logged-in user
+          const userProperties = data.filter((property: Property) => property.usuario_id === user?.id);
+          setProperties(userProperties);
         }
       } catch (error) {
         console.error("Erro ao buscar imóveis:", error);
