@@ -71,11 +71,11 @@ export default function AnunciarPage() {
     }
   };
 
-  // Trata a seleção de arquivos
+  // Trata a seleção de arquivos e permite múltiplos uploads, acumulando as imagens selecionadas
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      setFormData((prev) => ({ ...prev, fotos: files }));
+      setFormData((prev) => ({ ...prev, fotos: [...prev.fotos, ...files] }));
     }
   };
 
@@ -360,14 +360,18 @@ export default function AnunciarPage() {
                     style={{ display: "none" }}
                   />
                 </div>
+                {/* Exibição das pré-visualizações das imagens selecionadas */}
                 {formData.fotos.length > 0 && (
-                  <div className="mt-4">
-                    <strong>Arquivos selecionados:</strong>
-                    <ul className="list-disc list-inside">
-                      {formData.fotos.map((file, index) => (
-                        <li key={index}>{file.name}</li>
-                      ))}
-                    </ul>
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {formData.fotos.map((file, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${index}`}
+                          className="w-full h-32 object-cover rounded"
+                        />
+                      </div>
+                    ))}
                   </div>
                 )}
                 <div className="flex justify-between">

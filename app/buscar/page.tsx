@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/property-card";
@@ -188,6 +187,7 @@ export default function SearchPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
+            {/* Conteúdo dos filtros (omissão para brevidade) */}
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
@@ -459,9 +459,7 @@ export default function SearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {paginatedProperties.map((property) => (
                 <motion.div key={property.id} variants={itemVariants}>
-                  <Link href={`/exibir-imoveis/${property.id}`}>
-                    <PropertyCard property={property} />
-                  </Link>
+                  <PropertyCard property={property} />
                 </motion.div>
               ))}
             </div>
@@ -479,14 +477,10 @@ export default function SearchPage() {
                   {Array.from({ length: totalPages }, (_, i) => (
                     <Button
                       key={i + 1}
-                      variant={
-                        currentPage === i + 1 ? "outline" : "outline"
-                      }
+                      variant={currentPage === i + 1 ? "outline" : "outline"}
                       onClick={() => setCurrentPage(i + 1)}
                       className={
-                        currentPage === i + 1
-                          ? "bg-[#3EA76F] text-white"
-                          : ""
+                        currentPage === i + 1 ? "bg-[#3EA76F] text-white" : ""
                       }
                     >
                       {i + 1}

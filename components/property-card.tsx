@@ -1,21 +1,9 @@
-"use client"; // Adicione esta linha no topo
+"use client";
 
 import React, { useState } from "react";
-import Image from "next/image"; // Se estiver usando Next.js
-import {
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-  Bed,
-  Bath,
-  Maximize,
-  Home,
-  Building2,
-  Warehouse,
-  Map,
-  Heart,
-  ImageIcon,
-} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "./ui/card";
 
@@ -45,13 +33,17 @@ export default function PropertyCard({ property }: { property?: Property }) {
 
   const nextImage = () => {
     if (photos.length > 0) {
-      setCurrentImageIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+      setCurrentImageIndex((prev) =>
+        prev === photos.length - 1 ? 0 : prev + 1
+      );
     }
   };
 
   const previousImage = () => {
     if (photos.length > 0) {
-      setCurrentImageIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? photos.length - 1 : prev - 1
+      );
     }
   };
 
@@ -76,11 +68,34 @@ export default function PropertyCard({ property }: { property?: Property }) {
           />
         )}
 
+        {photos.length > 1 && (
+          <>
+            <button
+              onClick={previousImage}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-700" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-700" />
+            </button>
+          </>
+        )}
+
         <button
           onClick={() => setIsFavorite(!isFavorite)}
           className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg"
         >
-          <Heart className={`w-5 h-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-500"}`} />
+          <Heart
+            className={`w-5 h-5 ${
+              isFavorite
+                ? "fill-red-500 text-red-500"
+                : "text-gray-500"
+            }`}
+          />
         </button>
       </div>
       <div className="p-4">
@@ -98,10 +113,14 @@ export default function PropertyCard({ property }: { property?: Property }) {
             <span className="text-2xl font-bold text-[#3EA76F]">
               R$ {property.valor_agio.toLocaleString()}
             </span>
-            <span className="text-sm text-gray-500 block">Valor do ágio</span>
+            <span className="text-sm text-gray-500 block">
+              Valor do ágio
+            </span>
           </div>
           <div className="text-right">
-            <span className="text-sm text-gray-500 block">Parcela atual</span>
+            <span className="text-sm text-gray-500 block">
+              Parcela atual
+            </span>
             <span className="font-semibold">
               R$ {property.valor_parcela_atual.toLocaleString()}/mês
             </span>
@@ -112,7 +131,9 @@ export default function PropertyCard({ property }: { property?: Property }) {
           <span>{property.banheiros} banheiros</span>
           <span>{property.area} m²</span>
         </div>
-        <Button className="w-full">Ver Detalhes</Button>
+        <Link href={`/exibir-imoveis/${property.id}`}>
+          <Button className="w-full">Ver Detalhes</Button>
+        </Link>
       </div>
     </Card>
   );
