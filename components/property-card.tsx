@@ -1,14 +1,25 @@
-"use client";
+"use client"; // Adicione esta linha no topo
 
-import Image from "next/image";
-import { Card } from "@/components/ui/card";
+import React, { useState } from "react";
+import Image from "next/image"; // Se estiver usando Next.js
+import {
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Bed,
+  Bath,
+  Maximize,
+  Home,
+  Building2,
+  Warehouse,
+  Map,
+  Heart,
+  ImageIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Heart, Image as ImageIcon } from "lucide-react"; // Importa o ícone de imagem
-import { useState } from "react";
+import { Card } from "./ui/card";
 
-export interface Property {
-  cep: ReactNode;
-  cidade: ReactNode;
+interface Property {
   id: number;
   tipo_imovel: string;
   area: number;
@@ -16,63 +27,60 @@ export interface Property {
   banheiros: number;
   endereco: string;
   descricao: string;
-  fotos: string[];
+  fotos?: string[];
   valor_agio: number;
   valor_parcela_atual: number;
   parcelas_restantes: number;
   valor_total_financiado: number;
+  cep: string;
+  cidade: string;
 }
 
-interface PropertyCardProps {
-  property: Property;
-}
+export default function PropertyCard({ property }: { property?: Property }) {
+  if (!property) return null;
 
-export default function PropertyCard({ property }: PropertyCardProps) {
-  // Verifica se property foi definida para evitar erros de leitura
-  if (!property) {
-    return (
-      <Card className="overflow-hidden group">
-        <div className="p-4 flex items-center justify-center">
-          <span className="text-sm font-medium text-[#3EA76F]">
-            Imóvel não definido
-          </span>
-        </div>
-      </Card>
-    );
-  }
-
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const photos = property.fotos || [];
   const [isFavorite, setIsFavorite] = useState(false);
-  
-  // Verifica se há imagens disponíveis utilizando optional chaining
-  const hasImage = (property?.fotos ?? []).length > 0;
-  const imageUrl = hasImage ? property.fotos[0] : null;
+
+  const nextImage = () => {
+    if (photos.length > 0) {
+      setCurrentImageIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+    }
+  };
+
+  const previousImage = () => {
+    if (photos.length > 0) {
+      setCurrentImageIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+    }
+  };
 
   return (
     <Card className="overflow-hidden group">
       <div className="relative">
-        {imageUrl ? (
+        {photos.length > 0 ? (
           <Image
-            src={imageUrl}
+            src={`http://127.0.0.1:8000/storage/${photos[currentImageIndex]}`}
             alt={property.tipo_imovel}
             width={400}
             height={300}
             className="w-full h-[200px] object-cover transition-transform group-hover:scale-105"
           />
         ) : (
-          // Caso não tenha foto, renderiza um ícone de imagem
-          <div className="w-full h-[200px] flex items-center justify-center bg-gray-100">
-            <ImageIcon className="w-12 h-12 text-gray-500" />
-          </div>
+          <Image
+            src="/default-image.jpg"
+            alt="Imagem padrão"
+            width={400}
+            height={300}
+            className="w-full h-[200px] object-cover transition-transform group-hover:scale-105"
+          />
         )}
+
         <button
           onClick={() => setIsFavorite(!isFavorite)}
           className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg"
         >
-          <Heart
-            className={`w-5 h-5 ${
-              isFavorite ? "fill-red-500 text-red-500" : "text-gray-500"
-            }`}
-          />
+          <Heart className={`w-5 h-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-gray-500"}`} />
         </button>
       </div>
       <div className="p-4">
@@ -84,9 +92,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             {property.endereco}
           </span>
         </div>
-        <h3 className="text-lg font-semibold mb-2">
-          {property.cidade}
-        </h3>
+        <h3 className="text-lg font-semibold mb-2">{property.cidade}</h3>
         <div className="flex items-center justify-between mb-4">
           <div>
             <span className="text-2xl font-bold text-[#3EA76F]">

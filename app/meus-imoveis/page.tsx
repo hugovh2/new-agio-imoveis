@@ -34,7 +34,6 @@ interface Property {
   valor_total_financiado: number;
 }
 
-
 function PropertyCard({ property }: { property: Property }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -81,7 +80,11 @@ function PropertyCard({ property }: { property: Property }) {
       {/* Galeria de Imagens */}
       <div className="relative h-64">
         <img
-          src={property.fotos?.[currentImageIndex] ?? '/default-image.jpg'}
+          src={
+            property.fotos && property.fotos[currentImageIndex]
+              ? `http://127.0.0.1:8000/storage/${property.fotos[currentImageIndex]}`
+              : '/default-image.jpg'
+          }
           alt={property.descricao || 'Imagem do imóvel'}
           className="w-full h-full object-cover"
           loading="lazy"
@@ -210,12 +213,15 @@ export default function MeusImoveisPage() {
     }
   }, [user]);
 
-  // Filtra os imóveis conforme a busca e o tipo selecionado
+  // Filtra os imóveis conforme a busca, o tipo selecionado e que possuem fotos válidas
   const filteredProperties = properties.filter(property => {
     const matchesSearch = property.endereco.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           property.descricao.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = propertyType === 'all' || property.tipo_imovel.toLowerCase() === propertyType;
-    return matchesSearch && matchesType;
+    const hasValidPhotos =
+      property.fotos &&
+      property.fotos.filter(photo => typeof photo === 'string' && photo.trim() !== '').length > 0;
+    return matchesSearch && matchesType && hasValidPhotos;
   });
 
   const sortedProperties = [...filteredProperties].sort((a, b) => {

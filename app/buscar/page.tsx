@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link"; // Importa o Link para navegação
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/property-card";
@@ -41,13 +41,11 @@ export default function SearchPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // Sempre que algum filtro mudar, reinicia a página atual para 1
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
-  // Busca os imóveis via API e normaliza o campo "fotos"
   useEffect(() => {
     async function fetchProperties() {
       try {
@@ -67,7 +65,6 @@ export default function SearchPage() {
     fetchProperties();
   }, []);
 
-  // Aplica os filtros aos imóveis
   const filteredProperties = properties.filter((property) => {
     const matchesLocation = property.endereco
       .toLowerCase()
@@ -75,7 +72,6 @@ export default function SearchPage() {
     const matchesType =
       filters.type === "all" ||
       property.tipo_imovel.toLowerCase() === filters.type;
-
     let matchesBedrooms = true;
     if (filters.bedrooms !== "any") {
       if (filters.bedrooms === "3+") {
@@ -84,7 +80,6 @@ export default function SearchPage() {
         matchesBedrooms = property.quartos === parseInt(filters.bedrooms, 10);
       }
     }
-
     let matchesBathrooms = true;
     if (filters.bathrooms !== "any") {
       if (filters.bathrooms === "3+") {
@@ -93,15 +88,12 @@ export default function SearchPage() {
         matchesBathrooms = property.banheiros === parseInt(filters.bathrooms, 10);
       }
     }
-
     const matchesPrice =
       property.valor_agio >= priceRange[0] &&
       property.valor_agio <= priceRange[1];
-
     const matchesArea =
       property.area >= areaRange[0] &&
       property.area <= areaRange[1];
-
     return (
       matchesLocation &&
       matchesType &&
@@ -112,7 +104,6 @@ export default function SearchPage() {
     );
   });
 
-  // Ordena os imóveis conforme o critério selecionado
   const sortedProperties = [...filteredProperties].sort((a, b) => {
     if (filters.sortBy === "recent") {
       return b.id - a.id;
@@ -124,14 +115,12 @@ export default function SearchPage() {
     return 0;
   });
 
-  // Cálculo da paginação
   const totalPages = Math.ceil(sortedProperties.length / itemsPerPage);
   const paginatedProperties = sortedProperties.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  // Variantes para animação com Framer Motion
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -332,7 +321,7 @@ export default function SearchPage() {
                   </button>
                 </div>
                 <div className="space-y-6">
-                  {/* Mesmo conteúdo de filtros do desktop */}
+                  {/* Conteúdo dos filtros (mesmo do desktop) */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Tipo de Imóvel
@@ -444,10 +433,12 @@ export default function SearchPage() {
             initial="hidden"
             animate="visible"
           >
-            {/* Controles de Ordenação */}
             <div className="flex justify-between items-center mb-6">
               <p className="text-gray-600">
-                <span className="font-semibold">{sortedProperties.length}</span> imóveis encontrados
+                <span className="font-semibold">
+                  {sortedProperties.length}
+                </span>{" "}
+                imóveis encontrados
               </p>
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-600">Ordenar por:</label>
@@ -465,11 +456,9 @@ export default function SearchPage() {
               </div>
             </div>
 
-            {/* Exibe as Propriedades Paginadas */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {paginatedProperties.map((property) => (
                 <motion.div key={property.id} variants={itemVariants}>
-                  {/* Link para a página de detalhes do imóvel */}
                   <Link href={`/exibir-imoveis/${property.id}`}>
                     <PropertyCard property={property} />
                   </Link>
@@ -477,7 +466,6 @@ export default function SearchPage() {
               ))}
             </div>
 
-            {/* Paginação Dinâmica */}
             {totalPages > 1 && (
               <div className="mt-8 flex justify-center">
                 <nav className="flex items-center gap-2">
@@ -491,9 +479,15 @@ export default function SearchPage() {
                   {Array.from({ length: totalPages }, (_, i) => (
                     <Button
                       key={i + 1}
-                      variant={currentPage === i + 1 ? "outline" : "outline"}
+                      variant={
+                        currentPage === i + 1 ? "outline" : "outline"
+                      }
                       onClick={() => setCurrentPage(i + 1)}
-                      className={currentPage === i + 1 ? "bg-[#3EA76F] text-white" : ""}
+                      className={
+                        currentPage === i + 1
+                          ? "bg-[#3EA76F] text-white"
+                          : ""
+                      }
                     >
                       {i + 1}
                     </Button>
