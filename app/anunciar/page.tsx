@@ -40,9 +40,9 @@ export default function AnunciarPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Consulta a API do ViaCEP para preencher automaticamente os dados do endereço
+  // Consulta a API ViaCEP para preencher automaticamente os dados do endereço a partir do CEP
   const handleCepBlur = async () => {
-    const cep = formData.cep.replace(/\D/g, ""); // Remove caracteres não numéricos
+    const cep = formData.cep.replace(/\D/g, "");
     if (cep.length === 8) {
       try {
         const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
@@ -53,7 +53,7 @@ export default function AnunciarPage() {
             endereco: data.logradouro || "",
             complemento: data.complemento || "",
             cidade: data.localidade || "",
-            estado: data.uf || "",
+            estado: data.estado || "",
           }));
         } else {
           alert("CEP não encontrado.");
