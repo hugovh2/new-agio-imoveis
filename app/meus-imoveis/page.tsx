@@ -18,6 +18,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 
 interface Property {
+  estado: any;
   id: number;
   usuario_id: number; // Added this field
   tipo_imovel: string;
@@ -218,12 +219,18 @@ export default function MeusImoveisPage() {
 
   // Filtra os imóveis conforme a busca, o tipo selecionado e que possuem fotos válidas
   const filteredProperties = properties.filter(property => {
-    const matchesSearch = property.endereco.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          property.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+      property.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.endereco.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (property.estado && property.estado.toLowerCase().includes(searchTerm.toLowerCase())); // Adicionado estado
+  
     const matchesType = propertyType === 'all' || property.tipo_imovel.toLowerCase() === propertyType;
+  
     const hasValidPhotos =
       property.fotos &&
       property.fotos.filter(photo => typeof photo === 'string' && photo.trim() !== '').length > 0;
+  
     return matchesSearch && matchesType && hasValidPhotos;
   });
 

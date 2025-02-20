@@ -1,11 +1,17 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Camera, DollarSign, Home, Upload } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AnunciarPage() {
+  // Hook para redirecionamento
+  const router = useRouter();
+
   // Estado para gerenciar a etapa atual (1 a 4)
   const [step, setStep] = useState(1);
 
@@ -53,13 +59,14 @@ export default function AnunciarPage() {
             endereco: data.logradouro || "",
             complemento: data.complemento || "",
             cidade: data.localidade || "",
-            estado: data.estado || "",
+            estado: data.uf || "",
           }));
         } else {
-          alert("CEP não encontrado.");
+          toast.error("CEP não encontrado.");
         }
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
+        toast.error("Erro ao buscar CEP. Tente novamente.");
       }
     }
   };
@@ -105,14 +112,16 @@ export default function AnunciarPage() {
       });
 
       if (response.ok) {
-        alert("Anúncio enviado com sucesso!");
-        // Limpe o formulário ou redirecione conforme necessário
+        toast.success("Anúncio enviado com sucesso!");
+        // Redireciona para a página "Meus Anúncios"
+        router.push("/meus-imoveis");
       } else {
         const errorData = await response.json();
-        alert("Erro: " + errorData.message);
+        toast.error("Erro: " + errorData.message);
       }
     } catch (error) {
       console.error("Erro ao enviar anúncio:", error);
+      toast.error("Ocorreu um erro ao enviar o anúncio. Tente novamente.");
     }
   };
 
@@ -121,7 +130,9 @@ export default function AnunciarPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#3EA76F] to-[#48C78E] py-20">
         <div className="container mx-auto px-4 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Anuncie seu Imóvel</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            Anuncie seu Imóvel
+          </h1>
           <p className="text-xl max-w-2xl mx-auto">
             Cadastre seu imóvel de forma rápida e segura, preenchendo os dados em etapas.
           </p>
@@ -135,41 +146,25 @@ export default function AnunciarPage() {
             {/* Progress Steps */}
             <div className="flex justify-between mb-12">
               <div className={`flex-1 text-center ${step >= 1 ? "text-[#3EA76F]" : "text-gray-400"}`}>
-                <div
-                  className={`w-8 h-8 rounded-full ${
-                    step >= 1 ? "bg-[#3EA76F]" : "bg-gray-200"
-                  } flex items-center justify-center mx-auto mb-2`}
-                >
+                <div className={`w-8 h-8 rounded-full ${step >= 1 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
                   <Home className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm">Dados do Imóvel</span>
               </div>
               <div className={`flex-1 text-center ${step >= 2 ? "text-[#3EA76F]" : "text-gray-400"}`}>
-                <div
-                  className={`w-8 h-8 rounded-full ${
-                    step >= 2 ? "bg-[#3EA76F]" : "bg-gray-200"
-                  } flex items-center justify-center mx-auto mb-2`}
-                >
+                <div className={`w-8 h-8 rounded-full ${step >= 2 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
                   <Home className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm">Dados do Endereço</span>
               </div>
               <div className={`flex-1 text-center ${step >= 3 ? "text-[#3EA76F]" : "text-gray-400"}`}>
-                <div
-                  className={`w-8 h-8 rounded-full ${
-                    step >= 3 ? "bg-[#3EA76F]" : "bg-gray-200"
-                  } flex items-center justify-center mx-auto mb-2`}
-                >
+                <div className={`w-8 h-8 rounded-full ${step >= 3 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
                   <Camera className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm">Fotos</span>
               </div>
               <div className={`flex-1 text-center ${step >= 4 ? "text-[#3EA76F]" : "text-gray-400"}`}>
-                <div
-                  className={`w-8 h-8 rounded-full ${
-                    step >= 4 ? "bg-[#3EA76F]" : "bg-gray-200"
-                  } flex items-center justify-center mx-auto mb-2`}
-                >
+                <div className={`w-8 h-8 rounded-full ${step >= 4 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
                   <DollarSign className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm">Valores</span>
@@ -344,11 +339,18 @@ export default function AnunciarPage() {
                 <h2 className="text-2xl font-semibold mb-6">Fotos do Imóvel</h2>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">Arraste suas fotos aqui ou</p>
-                  <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                  <p className="text-gray-600 mb-2">
+                    Arraste suas fotos aqui ou
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
                     Selecionar Arquivos
                   </Button>
-                  <p className="text-sm text-gray-500 mt-2">PNG, JPG até 5MB</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    PNG, JPG até 5MB
+                  </p>
                   <input
                     type="file"
                     multiple
@@ -442,6 +444,7 @@ export default function AnunciarPage() {
           </div>
         </div>
       </section>
+      <ToastContainer />
     </div>
   );
 }
