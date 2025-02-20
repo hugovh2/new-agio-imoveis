@@ -12,7 +12,12 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Ágio Imóveis | Seu Próximo Imóvel Está Aqui',
   description: 'Encontre as melhores oportunidades de ágio de imóveis',
+  icons: {
+    icon: '/favicon.ico', // Caminho padrão no Next.js
+  },
 };
+
+
 
 export default function RootLayout({
   children,
@@ -34,3 +39,4 @@ export default function RootLayout({
     </html>
   );
 }
+

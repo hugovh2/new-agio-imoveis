@@ -6,10 +6,9 @@ import { useAuth } from "@/context/AuthContext";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { user } = useAuth(); // Supondo que o contexto de autenticação já esteja fornecendo as informações do usuário.
+  const { user } = useAuth(); 
 
   useEffect(() => {
-    // Aqui você pode colocar lógica para carregar dados de perfil após a autenticação, se necessário.
   }, [user]);
 
   if (!user) {

@@ -34,12 +34,16 @@ export default function Header() {
             <Link href="/contato" className="text-gray-600 hover:text-[#3EA76F]">
               Contato
             </Link>
+            {user && (
+              <Link href="/meus-imoveis" className="text-gray-600 hover:text-[#3EA76F]">
+                Meus Imóveis
+              </Link>
+            )}
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                {/* Link para a página de perfil */}
                 <Link href="/perfil">
                   <span className="text-gray-600 cursor-pointer">Olá, {user.name}</span>
                 </Link>
@@ -55,9 +59,7 @@ export default function Header() {
                 >
                   Entrar
                 </Button>
-                <Button
-                  onClick={() => router.push('/auth/register')}
-                >
+                <Button onClick={() => router.push('/auth/register')}>
                   Cadastrar
                 </Button>
               </>
@@ -102,10 +104,17 @@ export default function Header() {
             >
               Contato
             </Link>
+            {user && (
+              <Link
+                href="/meus-imoveis"
+                className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
+              >
+                Meus Imóveis
+              </Link>
+            )}
             <div className="pt-2 space-y-2">
               {user ? (
                 <>
-                  {/* Link para a página de perfil */}
                   <Link href="/perfil/profile">
                     <span className="block text-gray-600 cursor-pointer">Olá, {user.name}</span>
                   </Link>
