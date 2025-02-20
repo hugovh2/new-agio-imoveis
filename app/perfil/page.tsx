@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Settings, Bell, MessageSquare, ChevronRight, Edit2, MapPin, Mail, Phone, Calendar, Briefcase } from 'lucide-react';
 import { useAuth } from "@/context/AuthContext";
+import { randomAvatar } from '@/lib/utils';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -18,6 +19,8 @@ function App() {
       </div>
     );
   }
+
+  const avatar = user.avatar ? user.avatar : randomAvatar();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,7 +55,7 @@ function App() {
             <div className="flex flex-col items-center">
               <div className="relative">
                 <img 
-                  src={user.avatar} 
+                  src={avatar} 
                   alt={user.name}
                   className="w-24 h-24 rounded-full object-cover border-4 border-[#A7EBC1]"
                 />
@@ -66,7 +69,7 @@ function App() {
 
             <nav className="mt-8">
               <ul className="space-y-2">
-                {['Visão Geral', 'Imóveis', 'Mensagens', 'Calendário', 'Configurações'].map((item) => (
+                {['Visão Geral', 'Meus Imóveis', 'Mensagens', 'Calendário', 'Configurações'].map((item) => (
                   <li key={item}>
                     <button className="w-full p-3 flex items-center justify-between rounded-lg hover:bg-gray-50 transition-colors">
                       <span className="text-gray-700">{item}</span>
@@ -129,17 +132,18 @@ function App() {
                 <h3 className="text-lg font-semibold mb-4">Ações Rápidas</h3>
                 <div className="space-y-3">
                   {[
-                    'Adicionar Novo Imóvel',
-                    'Agendar Visita',
-                    'Ver Mensagens',
-                    'Editar Perfil'
-                  ].map((action) => (
-                    <button
-                      key={action}
-                      className="w-full p-3 text-left rounded-lg border border-gray-200 hover:border-[#3EA76F] hover:bg-[#A7EBC1]/10 transition-colors"
+                    { label: 'Adicionar Novo Imóvel', link: '/anunciar' },
+                    { label: 'Agendar Visita', link: '#' },
+                    { label: 'Ver Mensagens', link: '#' },
+                    { label: 'Editar Perfil', link: '#' }
+                  ].map(({ label, link }) => (
+                    <a
+                      key={label}
+                      href={link}
+                      className="w-full block p-3 text-left rounded-lg border border-gray-200 hover:border-[#3EA76F] hover:bg-[#A7EBC1]/10 transition-colors"
                     >
-                      {action}
-                    </button>
+                      {label}
+                    </a>
                   ))}
                 </div>
               </div>
@@ -152,3 +156,4 @@ function App() {
 }
 
 export default App;
+
