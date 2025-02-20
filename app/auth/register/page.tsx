@@ -1,6 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Mail,
   Lock,
@@ -73,7 +75,9 @@ export default function RegisterPage() {
         errors.push("Senha deve ter no mínimo 6 caracteres.");
     } else if (step === 4) {
       if (!formData.termos_aceitos)
-        errors.push("Você precisa aceitar os Termos de Uso e a Política de Privacidade.");
+        errors.push(
+          "Você precisa aceitar os Termos de Uso e a Política de Privacidade."
+        );
     }
 
     return errors;
@@ -125,10 +129,13 @@ export default function RegisterPage() {
         throw new Error(data.message || "Erro ao cadastrar");
       }
 
-      alert("Cadastro realizado com sucesso!");
-      router.push("/auth/login");
+      toast.success("Cadastro realizado com sucesso!");
+      // Aguarda 3 segundos para que o toast seja exibido antes do redirecionamento
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 3000);
     } catch (error: any) {
-      alert(error.message || "Ocorreu um erro.");
+      toast.error(error.message || "Ocorreu um erro.");
     } finally {
       setIsLoading(false);
     }
@@ -303,22 +310,22 @@ export default function RegisterPage() {
                         </div>
                       </div>
                       <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">
-                        Telefone
-                      </label>
-                      <div className="relative group">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#3EA76F] transition-colors" />
-                        <input
-                          type="text"
-                          name="telefone"
-                          placeholder="Seu telefone"
-                          value={formData.telefone}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3EA76F]/20 focus:border-[#3EA76F] h-12"
-                          required
-                        />
+                        <label className="text-sm font-medium text-gray-700">
+                          Telefone
+                        </label>
+                        <div className="relative group">
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#3EA76F] transition-colors" />
+                          <input
+                            type="text"
+                            name="telefone"
+                            placeholder="Seu telefone"
+                            value={formData.telefone}
+                            onChange={handleChange}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3EA76F]/20 focus:border-[#3EA76F] h-12"
+                            required
+                          />
+                        </div>
                       </div>
-                    </div>
                     </>
                   ) : (
                     <>
@@ -569,7 +576,7 @@ export default function RegisterPage() {
               </div>
             </form>
 
-            {step === 1 && (
+            {/* {step === 1 && (
               <>
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
@@ -593,7 +600,7 @@ export default function RegisterPage() {
                   </button>
                 </div>
               </>
-            )}
+            )} */}
 
             <div className="text-center mt-6">
               <p className="text-sm text-gray-600">
@@ -621,6 +628,8 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+      {/* Componente ToastContainer para exibir as notificações */}
+      <ToastContainer />
     </div>
   );
 }
