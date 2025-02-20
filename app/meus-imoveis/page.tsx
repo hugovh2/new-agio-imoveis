@@ -24,6 +24,8 @@ interface Property {
   quartos: number;
   banheiros: number;
   endereco: string;
+  cidade: string;
+  cep: string;
   descricao: string;
   fotos: string[] | null;
   valor_agio: number;
@@ -31,6 +33,7 @@ interface Property {
   parcelas_restantes: number;
   valor_total_financiado: number;
 }
+
 
 function PropertyCard({ property }: { property: Property }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -112,7 +115,7 @@ function PropertyCard({ property }: { property: Property }) {
 
       {/* Conteúdo do Cartão */}
       <div className="p-6">
-        <h3 className="text-xl font-semibold mb-2 text-gray-800">{property.endereco}</h3>
+        <h3 className="text-xl font-semibold mb-2 text-gray-800">{property.cidade}</h3>
         <div className="flex items-center gap-4 mb-4 text-gray-600">
           <div className="flex items-center gap-1">
             <Maximize className="h-4 w-4" />

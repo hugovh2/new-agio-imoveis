@@ -3,20 +3,12 @@
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Heart, Image as ImageIcon } from "lucide-react"; // Importa o ícone de imagem
 import { useState } from "react";
 
-// Imagens de fallback para o caso do imóvel não ter fotos
-const fallbackImages = [
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-  "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-  "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-  "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-];
-
 export interface Property {
+  cep: ReactNode;
+  cidade: ReactNode;
   id: number;
   tipo_imovel: string;
   area: number;
@@ -36,24 +28,42 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property }: PropertyCardProps) {
+  // Verifica se property foi definida para evitar erros de leitura
+  if (!property) {
+    return (
+      <Card className="overflow-hidden group">
+        <div className="p-4 flex items-center justify-center">
+          <span className="text-sm font-medium text-[#3EA76F]">
+            Imóvel não definido
+          </span>
+        </div>
+      </Card>
+    );
+  }
+
   const [isFavorite, setIsFavorite] = useState(false);
   
-  // Seleciona a imagem: se houver fotos cadastradas, usa a primeira; caso contrário, usa uma imagem de fallback
-  const imageUrl =
-    property.fotos && property.fotos.length > 0
-      ? property.fotos[0]
-      : fallbackImages[0];
+  // Verifica se há imagens disponíveis utilizando optional chaining
+  const hasImage = (property?.fotos ?? []).length > 0;
+  const imageUrl = hasImage ? property.fotos[0] : null;
 
   return (
     <Card className="overflow-hidden group">
       <div className="relative">
-        <Image
-          src={imageUrl}
-          alt={property.tipo_imovel}
-          width={400}
-          height={300}
-          className="w-full h-[200px] object-cover transition-transform group-hover:scale-105"
-        />
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={property.tipo_imovel}
+            width={400}
+            height={300}
+            className="w-full h-[200px] object-cover transition-transform group-hover:scale-105"
+          />
+        ) : (
+          // Caso não tenha foto, renderiza um ícone de imagem
+          <div className="w-full h-[200px] flex items-center justify-center bg-gray-100">
+            <ImageIcon className="w-12 h-12 text-gray-500" />
+          </div>
+        )}
         <button
           onClick={() => setIsFavorite(!isFavorite)}
           className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg"
@@ -75,7 +85,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </span>
         </div>
         <h3 className="text-lg font-semibold mb-2">
-          {property.descricao}
+          {property.cidade}
         </h3>
         <div className="flex items-center justify-between mb-4">
           <div>

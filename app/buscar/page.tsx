@@ -26,6 +26,7 @@ interface Property {
 export default function SearchPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [priceRange, setPriceRange] = useState([0, 500000]);
+  const [areaRange, setAreaRange] = useState([0, 1000]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
     location: "",
@@ -34,19 +35,22 @@ export default function SearchPage() {
     bathrooms: "any",
     sortBy: "recent",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
+  // Sempre que algum filtro mudar, reinicia a página atual para 1
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
   };
 
-  // Busca todos os imóveis cadastrados via API
+  // Busca os imóveis via API e normaliza o campo "fotos"
   useEffect(() => {
     async function fetchProperties() {
       try {
         const res = await fetch("http://127.0.0.1:8000/api/imoveis");
         if (res.ok) {
           const data = await res.json();
-          // Normaliza os dados para que "fotos" seja sempre um array
           const normalizedData = data.map((property: any) => ({
             ...property,
             fotos: property.fotos || [],
@@ -91,19 +95,23 @@ export default function SearchPage() {
       property.valor_agio >= priceRange[0] &&
       property.valor_agio <= priceRange[1];
 
+    const matchesArea =
+      property.area >= areaRange[0] &&
+      property.area <= areaRange[1];
+
     return (
       matchesLocation &&
       matchesType &&
       matchesBedrooms &&
       matchesBathrooms &&
-      matchesPrice
+      matchesPrice &&
+      matchesArea
     );
   });
 
   // Ordena os imóveis conforme o critério selecionado
   const sortedProperties = [...filteredProperties].sort((a, b) => {
     if (filters.sortBy === "recent") {
-      // Ordena pelos mais recentes (supondo que id maior seja mais recente)
       return b.id - a.id;
     } else if (filters.sortBy === "price-asc") {
       return a.valor_agio - b.valor_agio;
@@ -113,6 +121,14 @@ export default function SearchPage() {
     return 0;
   });
 
+  // Cálculo da paginação
+  const totalPages = Math.ceil(sortedProperties.length / itemsPerPage);
+  const paginatedProperties = sortedProperties.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Variantes para animação com Framer Motion
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -187,6 +203,7 @@ export default function SearchPage() {
                   Filtros
                 </h3>
                 <div className="space-y-4">
+                  {/* Tipo de Imóvel */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Tipo de Imóvel
@@ -205,6 +222,7 @@ export default function SearchPage() {
                     </select>
                   </div>
 
+                  {/* Quartos */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Quartos
@@ -213,9 +231,7 @@ export default function SearchPage() {
                       {["any", "1", "2", "3+"].map((value) => (
                         <button
                           key={value}
-                          onClick={() =>
-                            handleFilterChange("bedrooms", value)
-                          }
+                          onClick={() => handleFilterChange("bedrooms", value)}
                           className={`p-2 text-sm rounded-md border transition-colors ${
                             filters.bedrooms === value
                               ? "border-[#3EA76F] bg-[#3EA76F]/10 text-[#3EA76F]"
@@ -228,6 +244,7 @@ export default function SearchPage() {
                     </div>
                   </div>
 
+                  {/* Banheiros */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Banheiros
@@ -251,6 +268,7 @@ export default function SearchPage() {
                     </div>
                   </div>
 
+                  {/* Valor do Ágio */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Valor do Ágio (R$)
@@ -266,6 +284,25 @@ export default function SearchPage() {
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>R$ {priceRange[0].toLocaleString()}</span>
                       <span>R$ {priceRange[1].toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {/* Área (m²) */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Área (m²)
+                    </label>
+                    <Slider
+                      defaultValue={[0, 1000]}
+                      max={1000}
+                      step={10}
+                      value={areaRange}
+                      onValueChange={setAreaRange}
+                      className="my-6"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>{areaRange[0]} m²</span>
+                      <span>{areaRange[1]} m²</span>
                     </div>
                   </div>
                 </div>
@@ -374,12 +411,30 @@ export default function SearchPage() {
                       <span>R$ {priceRange[1].toLocaleString()}</span>
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Área (m²)
+                    </label>
+                    <Slider
+                      defaultValue={[0, 1000]}
+                      max={1000}
+                      step={10}
+                      value={areaRange}
+                      onValueChange={setAreaRange}
+                      className="my-6"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>{areaRange[0]} m²</span>
+                      <span>{areaRange[1]} m²</span>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             </div>
           )}
 
-          {/* Grid de Propriedades */}
+          {/* Grid de Propriedades e Paginação */}
           <motion.div
             className="flex-1"
             variants={containerVariants}
@@ -396,7 +451,9 @@ export default function SearchPage() {
                 <select
                   className="rounded-md border border-input bg-background px-3 h-10"
                   value={filters.sortBy}
-                  onChange={(e) => handleFilterChange("sortBy", e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange("sortBy", e.target.value)
+                  }
                 >
                   <option value="recent">Mais recentes</option>
                   <option value="price-asc">Menor preço</option>
@@ -405,29 +462,46 @@ export default function SearchPage() {
               </div>
             </div>
 
-            {/* Exibe as propriedades */}
+            {/* Exibe as Propriedades Paginadas */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {sortedProperties.map((property) => (
+              {paginatedProperties.map((property) => (
                 <motion.div key={property.id} variants={itemVariants}>
                   <PropertyCard property={property} />
                 </motion.div>
               ))}
             </div>
 
-            {/* Paginação (exemplo estático) */}
-            <div className="mt-8 flex justify-center">
-              <nav className="flex items-center gap-2">
-                <Button variant="outline" disabled>
-                  Anterior
-                </Button>
-                <Button variant="outline" className="bg-[#3EA76F] text-white">
-                  1
-                </Button>
-                <Button variant="outline">2</Button>
-                <Button variant="outline">3</Button>
-                <Button variant="outline">Próxima</Button>
-              </nav>
-            </div>
+            {/* Paginação Dinâmica */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center">
+                <nav className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((prev) => prev - 1)}
+                  >
+                    Anterior
+                  </Button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <Button
+                      key={i + 1}
+                      variant={currentPage === i + 1 ? "outline" : "outline"}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={currentPage === i + 1 ? "bg-[#3EA76F] text-white" : ""}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                  >
+                    Próxima
+                  </Button>
+                </nav>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

@@ -6,27 +6,31 @@ import { Input } from "@/components/ui/input";
 import { Camera, DollarSign, Home, Upload } from "lucide-react";
 
 export default function AnunciarPage() {
+  // Estado para gerenciar a etapa atual (1 a 4)
   const [step, setStep] = useState(1);
-  
-  // Estado para armazenar os dados do formulário
+
+  // Estado do formulário com todos os campos
   const [formData, setFormData] = useState({
     tipo_imovel: "Apartamento",
     area: "",
     quartos: "",
     banheiros: "",
-    endereco: "",
     descricao: "",
-    fotos: [] as File[], // Armazena os arquivos selecionados
+    cep: "",
+    endereco: "",
+    complemento: "",
+    estado: "",
+    cidade: "",
+    fotos: [] as File[],
     valor_agio: "",
     valor_parcela_atual: "",
     parcelas_restantes: "",
     valor_total_financiado: "",
   });
 
-  // Referência para o input de arquivos (hidden)
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Atualiza o estado dos inputs de texto, select e textarea
+  // Atualiza os campos padrão do formulário
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -36,7 +40,31 @@ export default function AnunciarPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Função para tratar o input dos arquivos
+  // Consulta a API do ViaCEP para preencher automaticamente os dados do endereço
+  const handleCepBlur = async () => {
+    const cep = formData.cep.replace(/\D/g, ""); // Remove caracteres não numéricos
+    if (cep.length === 8) {
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await res.json();
+        if (!data.erro) {
+          setFormData((prev) => ({
+            ...prev,
+            endereco: data.logradouro || "",
+            complemento: data.complemento || "",
+            cidade: data.localidade || "",
+            estado: data.uf || "",
+          }));
+        } else {
+          alert("CEP não encontrado.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
+  };
+
+  // Trata a seleção de arquivos
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -44,20 +72,21 @@ export default function AnunciarPage() {
     }
   };
 
-  // Função para enviar os dados para o backend utilizando FormData
+  // Envia os dados para o backend via FormData
   const handleSubmit = async () => {
     try {
-      // Recupera o token (caso sua API exija autenticação via token)
       const token = localStorage.getItem("token");
-
-      // Cria um objeto FormData e adiciona os campos do formulário
       const data = new FormData();
       data.append("tipo_imovel", formData.tipo_imovel);
       data.append("area", formData.area);
       data.append("quartos", formData.quartos);
       data.append("banheiros", formData.banheiros);
-      data.append("endereco", formData.endereco);
       data.append("descricao", formData.descricao);
+      data.append("cep", formData.cep);
+      data.append("endereco", formData.endereco);
+      data.append("complemento", formData.complemento);
+      data.append("estado", formData.estado);
+      data.append("cidade", formData.cidade);
       formData.fotos.forEach((file) => {
         data.append("fotos[]", file);
       });
@@ -69,7 +98,6 @@ export default function AnunciarPage() {
       const response = await fetch("http://127.0.0.1:8000/api/imoveis", {
         method: "POST",
         headers: {
-          // Não defina Content-Type manualmente com FormData.
           Authorization: `Bearer ${token}`,
         },
         body: data,
@@ -77,7 +105,7 @@ export default function AnunciarPage() {
 
       if (response.ok) {
         alert("Anúncio enviado com sucesso!");
-        // Aqui você pode limpar o formulário ou redirecionar o usuário
+        // Limpe o formulário ou redirecione conforme necessário
       } else {
         const errorData = await response.json();
         alert("Erro: " + errorData.message);
@@ -92,14 +120,9 @@ export default function AnunciarPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#3EA76F] to-[#48C78E] py-20">
         <div className="container mx-auto px-4 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Anuncie seu Imóvel
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Anuncie seu Imóvel</h1>
           <p className="text-xl max-w-2xl mx-auto">
-            Anuncie seu ágio de imóveis e alcance milhares de compradores. Venda
-            seu ágio de forma rápida e segura com nossa plataforma intuitiva.
-            Maximize sua visibilidade e otimize negociações sem complicações.
-            Cadastre-se agora e transforme seu negócio imobiliário!
+            Cadastre seu imóvel de forma rápida e segura, preenchendo os dados em etapas.
           </p>
         </div>
       </section>
@@ -111,30 +134,53 @@ export default function AnunciarPage() {
             {/* Progress Steps */}
             <div className="flex justify-between mb-12">
               <div className={`flex-1 text-center ${step >= 1 ? "text-[#3EA76F]" : "text-gray-400"}`}>
-                <div className={`w-8 h-8 rounded-full ${step >= 1 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
+                <div
+                  className={`w-8 h-8 rounded-full ${
+                    step >= 1 ? "bg-[#3EA76F]" : "bg-gray-200"
+                  } flex items-center justify-center mx-auto mb-2`}
+                >
                   <Home className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-sm">Informações Básicas</span>
+                <span className="text-sm">Dados do Imóvel</span>
               </div>
               <div className={`flex-1 text-center ${step >= 2 ? "text-[#3EA76F]" : "text-gray-400"}`}>
-                <div className={`w-8 h-8 rounded-full ${step >= 2 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
+                <div
+                  className={`w-8 h-8 rounded-full ${
+                    step >= 2 ? "bg-[#3EA76F]" : "bg-gray-200"
+                  } flex items-center justify-center mx-auto mb-2`}
+                >
+                  <Home className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm">Dados do Endereço</span>
+              </div>
+              <div className={`flex-1 text-center ${step >= 3 ? "text-[#3EA76F]" : "text-gray-400"}`}>
+                <div
+                  className={`w-8 h-8 rounded-full ${
+                    step >= 3 ? "bg-[#3EA76F]" : "bg-gray-200"
+                  } flex items-center justify-center mx-auto mb-2`}
+                >
                   <Camera className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm">Fotos</span>
               </div>
-              <div className={`flex-1 text-center ${step >= 3 ? "text-[#3EA76F]" : "text-gray-400"}`}>
-                <div className={`w-8 h-8 rounded-full ${step >= 3 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
+              <div className={`flex-1 text-center ${step >= 4 ? "text-[#3EA76F]" : "text-gray-400"}`}>
+                <div
+                  className={`w-8 h-8 rounded-full ${
+                    step >= 4 ? "bg-[#3EA76F]" : "bg-gray-200"
+                  } flex items-center justify-center mx-auto mb-2`}
+                >
                   <DollarSign className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm">Valores</span>
               </div>
             </div>
 
-            {/* Step 1: Informações Básicas */}
+            {/* Step 1: Dados do Imóvel */}
             {step === 1 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-semibold mb-6">Informações do Imóvel</h2>
+                <h2 className="text-2xl font-semibold mb-6">Dados do Imóvel</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Tipo de Imóvel */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Tipo de Imóvel
@@ -151,6 +197,7 @@ export default function AnunciarPage() {
                       <option>Comercial</option>
                     </select>
                   </div>
+                  {/* Área */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Área (m²)
@@ -163,6 +210,7 @@ export default function AnunciarPage() {
                       onChange={handleInputChange}
                     />
                   </div>
+                  {/* Quartos */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Quartos
@@ -175,6 +223,7 @@ export default function AnunciarPage() {
                       onChange={handleInputChange}
                     />
                   </div>
+                  {/* Banheiros */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Banheiros
@@ -188,17 +237,7 @@ export default function AnunciarPage() {
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Endereço Completo
-                  </label>
-                  <Input
-                    name="endereco"
-                    placeholder="Rua, número, bairro, cidade"
-                    value={formData.endereco}
-                    onChange={handleInputChange}
-                  />
-                </div>
+                {/* Descrição */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Descrição
@@ -206,34 +245,109 @@ export default function AnunciarPage() {
                   <textarea
                     name="descricao"
                     className="w-full rounded-md border border-gray-300 p-2 h-32"
-                    placeholder="Descreva as características principais do imóvel"
+                    placeholder="Descreva as características do imóvel"
                     value={formData.descricao}
                     onChange={handleInputChange}
                   ></textarea>
                 </div>
                 <div className="flex justify-end">
-                  <Button onClick={() => setStep(2)}>
-                    Próximo
-                  </Button>
+                  <Button onClick={() => setStep(2)}>Próximo</Button>
                 </div>
               </div>
             )}
 
-            {/* Step 2: Fotos */}
+            {/* Step 2: Dados do Endereço */}
             {step === 2 && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold mb-6">Dados do Endereço</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* CEP */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      CEP
+                    </label>
+                    <Input
+                      name="cep"
+                      type="text"
+                      placeholder="Ex: 01001000"
+                      value={formData.cep}
+                      onChange={handleInputChange}
+                      onBlur={handleCepBlur}
+                    />
+                  </div>
+                  {/* Endereço */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Endereço
+                    </label>
+                    <Input
+                      name="endereco"
+                      type="text"
+                      placeholder="Logradouro, número, bairro"
+                      value={formData.endereco}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  {/* Complemento */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Complemento
+                    </label>
+                    <Input
+                      name="complemento"
+                      type="text"
+                      placeholder="Complemento"
+                      value={formData.complemento}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  {/* Estado */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Estado
+                    </label>
+                    <Input
+                      name="estado"
+                      type="text"
+                      placeholder="Estado"
+                      value={formData.estado}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  {/* Cidade */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Cidade
+                    </label>
+                    <Input
+                      name="cidade"
+                      type="text"
+                      placeholder="Cidade"
+                      value={formData.cidade}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-between">
+                  <Button variant="outline" onClick={() => setStep(1)}>
+                    Voltar
+                  </Button>
+                  <Button onClick={() => setStep(3)}>Próximo</Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Fotos do Imóvel */}
+            {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold mb-6">Fotos do Imóvel</h2>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 mb-2">Arraste suas fotos aqui ou</p>
-                  <Button
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
+                  <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
                     Selecionar Arquivos
                   </Button>
                   <p className="text-sm text-gray-500 mt-2">PNG, JPG até 5MB</p>
-                  {/* Input file escondido */}
                   <input
                     type="file"
                     multiple
@@ -243,7 +357,6 @@ export default function AnunciarPage() {
                     style={{ display: "none" }}
                   />
                 </div>
-                {/* Exibe um preview com os nomes dos arquivos selecionados */}
                 {formData.fotos.length > 0 && (
                   <div className="mt-4">
                     <strong>Arquivos selecionados:</strong>
@@ -255,16 +368,16 @@ export default function AnunciarPage() {
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={() => setStep(1)}>
+                  <Button variant="outline" onClick={() => setStep(2)}>
                     Voltar
                   </Button>
-                  <Button onClick={() => setStep(3)}>Próximo</Button>
+                  <Button onClick={() => setStep(4)}>Próximo</Button>
                 </div>
               </div>
             )}
 
-            {/* Step 3: Valores */}
-            {step === 3 && (
+            {/* Step 4: Valores */}
+            {step === 4 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold mb-6">Valores</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -318,7 +431,7 @@ export default function AnunciarPage() {
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={() => setStep(2)}>
+                  <Button variant="outline" onClick={() => setStep(3)}>
                     Voltar
                   </Button>
                   <Button onClick={handleSubmit}>Publicar Anúncio</Button>
