@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link"; // Importa o Link para navegação
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/property-card";
@@ -21,6 +22,8 @@ interface Property {
   valor_parcela_atual: number;
   parcelas_restantes: number;
   valor_total_financiado: number;
+  cep: string;
+  cidade: string;
 }
 
 export default function SearchPage() {
@@ -72,7 +75,7 @@ export default function SearchPage() {
     const matchesType =
       filters.type === "all" ||
       property.tipo_imovel.toLowerCase() === filters.type;
-    
+
     let matchesBedrooms = true;
     if (filters.bedrooms !== "any") {
       if (filters.bedrooms === "3+") {
@@ -466,7 +469,10 @@ export default function SearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {paginatedProperties.map((property) => (
                 <motion.div key={property.id} variants={itemVariants}>
-                  <PropertyCard property={property} />
+                  {/* Link para a página de detalhes do imóvel */}
+                  <Link href={`/exibir-imoveis/${property.id}`}>
+                    <PropertyCard property={property} />
+                  </Link>
                 </motion.div>
               ))}
             </div>
