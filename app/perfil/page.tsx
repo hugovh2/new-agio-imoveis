@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { randomAvatar } from '@/lib/utils';
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth(); 
 
   useEffect(() => {
@@ -50,7 +50,7 @@ function App() {
 
       <div className="pt-16 flex">
         {/* Sidebar */}
-        <aside className={`fixed h-full bg-white border-r border-gray-200 transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-0 -translate-x-full'}`}>
+        <aside className={`fixed inset-y-0 left-0 bg-white border-r border-gray-200 transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:w-64`}>
           <div className="p-6">
             <div className="flex flex-col items-center">
               <div className="relative">
@@ -82,18 +82,22 @@ function App() {
           </div>
         </aside>
 
+        {/* Overlay para mobile */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black opacity-50 md:hidden" 
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* Main Content */}
-        <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+        <main className="flex-1 transition-all duration-300 md:ml-64">
           <div className="container mx-auto px-6 py-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Info Card */}
               <div className="bg-white p-6 rounded-xl shadow-sm">
                 <h3 className="text-lg font-semibold mb-4">Informações Pessoais</h3>
                 <div className="space-y-4">
-                  {/* <div className="flex items-center space-x-3">
-                    <MapPin className="h-5 w-5 text-[#3EA76F]" />
-                    <span className="text-gray-600">{user.location}</span>
-                  </div> */}
                   <div className="flex items-center space-x-3">
                     <Mail className="h-5 w-5 text-[#3EA76F]" />
                     <span className="text-gray-600">{user.email}</span>
@@ -156,4 +160,3 @@ function App() {
 }
 
 export default App;
-
