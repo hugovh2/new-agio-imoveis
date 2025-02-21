@@ -283,7 +283,6 @@ function EditPropertyModal({
       });
 
       if (newPhotos) {
-        // Alterado: utilizando 'fotos' em vez de 'fotos[]'
         Array.from(newPhotos).forEach((file) => {
           data.append('fotos', file);
         });
@@ -527,7 +526,7 @@ export default function MeusImoveisPage() {
   async function fetchProperties() {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/imoveis', {
+      const res = await fetch('http://127.0.0.1:8000/api/meus-imoveis', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
