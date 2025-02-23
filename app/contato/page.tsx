@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, MessageSquare, Send, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock } from "lucide-react";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate form submission
+    // Simulação de envio do formulário
     setTimeout(() => {
       setIsLoading(false);
       setFormData({
@@ -66,152 +66,143 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 bg-gray-100">
       {/* Hero Section */}
-      <section className="relative h-[300px] overflow-hidden">
+      <section className="bg-gradient-to-r from-[#3EA76F] to-[#48C78E] relative h-[350px]  overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1564577160324-112d603f750f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"
-            alt="Contact"
+            alt="Contato"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#3EA76F]/90 to-[#48C78E]/90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-green-600/80 to-green-400/80" />
         </div>
-        <div className="relative h-full flex items-center justify-center text-center">
+        <div className="relative flex items-center justify-center h-full text-center px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-5xl font-extrabold text-white drop-shadow-lg mb-4">
               Entre em Contato
             </h1>
-            <p className="text-white/90 text-lg max-w-2xl mx-auto px-4">
-              Estamos aqui para ajudar. Nossa equipe está pronta para responder todas as suas dúvidas.
+            <p className="text-white/90 text-xl max-w-2xl mx-auto">
+              Nossa equipe está pronta para responder suas dúvidas e ajudar no que for preciso.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      {/* Main Content */}
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
+            {/* Formulário de Contato */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="bg-white rounded-2xl shadow-xl p-8"
+              transition={{ duration: 0.8 }}
+              className="bg-white rounded-3xl shadow-2xl p-10"
             >
-              <h2 className="text-2xl font-bold mb-6">Envie sua mensagem</h2>
+              <h2 className="text-3xl font-bold mb-8 text-gray-800">Envie sua Mensagem</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Nome completo
-                    </label>
+                    <label className="text-sm font-medium text-gray-700">Nome Completo</label>
                     <Input
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="h-12"
+                      className="h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Email
-                    </label>
+                    <label className="text-sm font-medium text-gray-700">Email</label>
                     <Input
                       name="email"
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="h-12"
+                      className="h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
                       required
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Telefone
-                    </label>
+                    <label className="text-sm font-medium text-gray-700">Telefone</label>
                     <Input
                       name="phone"
                       type="tel"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="h-12"
+                      className="h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Assunto
-                    </label>
+                    <label className="text-sm font-medium text-gray-700">Assunto</label>
                     <Input
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
-                      className="h-12"
+                      className="h-12 border-gray-300 focus:border-green-500 focus:ring-green-500"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Mensagem
-                  </label>
+                  <label className="text-sm font-medium text-gray-700">Mensagem</label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    rows={4}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    rows={5}
+                    className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-green-500"
                     required
                   />
                 </div>
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-[#3EA76F] hover:bg-[#48C78E]"
+                  className="w-full h-12 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-md transition-colors"
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
                   ) : (
-                    <>
-                      Enviar mensagem
-                      <Send className="ml-2 h-4 w-4" />
-                    </>
+                    <div className="flex items-center justify-center">
+                      Enviar Mensagem <Send className="ml-2 h-5 w-5" />
+                    </div>
                   )}
                 </Button>
               </form>
             </motion.div>
 
-            {/* Contact Information */}
-            <div className="space-y-8">
+            {/* Informações de Contato e Mapa */}
+            <div className="space-y-12">
+              {/* Informações de Contato */}
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 40 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.8 }}
               >
-                <h2 className="text-2xl font-bold mb-6">Informações de contato</h2>
+                <h2 className="text-3xl font-bold mb-8 text-gray-800">Informações de Contato</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {contactInfo.map((info, index) => {
                     const Icon = info.icon;
                     return (
                       <motion.div
                         key={index}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: info.delay }}
-                        className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+                        className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow"
                       >
-                        <div className="w-12 h-12 bg-[#3EA76F]/10 rounded-lg flex items-center justify-center mb-4">
-                          <Icon className="w-6 h-6 text-[#3EA76F]" />
+                        <div className="w-12 h-12 bg-green-600/10 rounded-lg flex items-center justify-center mb-4">
+                          <Icon className="w-6 h-6 text-green-600" />
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
                           {info.title}
                         </h3>
                         <p className="text-gray-600">{info.content}</p>
@@ -221,26 +212,34 @@ export default function ContactPage() {
                 </div>
               </motion.div>
 
-              {/* Map */}
+              {/* Seção do Mapa */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="bg-white p-6 rounded-xl shadow-lg"
+                transition={{ delay: 0.7 }}
+                className="bg-white p-6 rounded-2xl shadow-2xl"
               >
-                <h3 className="font-semibold text-gray-900 mb-4">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">
                   Nossa Localização
                 </h3>
-                <div className="aspect-video rounded-lg overflow-hidden">
+                <div className="relative rounded-xl overflow-hidden shadow-md">
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d245794.75539454045!2d-47.92770696805272!3d-15.721725324419551!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x935a3d18df9ae275%3A0x738470e469754a24!2sBras%C3%ADlia%2C%20DF!5e0!3m2!1spt-BR!2sbr!4v1694655238297!5m2!1spt-BR!2sbr"
                     width="100%"
-                    height="100%"
+                    height="350"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   />
+                  <a
+                    href="https://goo.gl/maps/yourCustomMapLink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute bottom-4 right-4 bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-500 transition-colors"
+                  >
+                    Abrir no Google Maps
+                  </a>
                 </div>
               </motion.div>
             </div>

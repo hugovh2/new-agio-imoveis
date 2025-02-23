@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Search,
   Home,
@@ -19,8 +19,11 @@ import {
   XCircle,
   Filter,
   SlidersHorizontal,
-  Loader2
+  Loader2,
 } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useForm } from 'react-hook-form';
 
 interface Property {
   estado: string;
@@ -41,6 +44,83 @@ interface Property {
   valor_total_financiado: number;
 }
 
+// Componente responsável pela galeria de imagens
+function ImageGallery({
+  fotos,
+  descricao,
+}: {
+  fotos: string[] | null;
+  descricao: string;
+}) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const nextImage = useCallback(() => {
+    if (fotos && fotos.length > 0) {
+      setCurrentImageIndex((prev) =>
+        prev === fotos.length - 1 ? 0 : prev + 1
+      );
+    }
+  }, [fotos]);
+
+  const previousImage = useCallback(() => {
+    if (fotos && fotos.length > 0) {
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? fotos.length - 1 : prev - 1
+      );
+    }
+  }, [fotos]);
+
+  return (
+    <div className="relative h-64">
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
+          <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
+        </div>
+      )}
+      <img
+        src={
+          fotos && fotos[currentImageIndex]
+            ? `http://127.0.0.1:8000/storage/${fotos[currentImageIndex]}`
+            : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1073&q=80'
+        }
+        alt={descricao || 'Imagem do imóvel'}
+        className="w-full h-full object-cover"
+        loading="lazy"
+        onLoad={() => setIsLoading(false)}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+
+      {fotos && fotos.length > 1 && (
+        <>
+          <button
+            onClick={previousImage}
+            aria-label="Imagem anterior"
+            title="Imagem anterior"
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5 text-gray-800" />
+          </button>
+          <button
+            onClick={nextImage}
+            aria-label="Próxima imagem"
+            title="Próxima imagem"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
+          >
+            <ChevronRight className="h-5 w-5 text-gray-800" />
+          </button>
+        </>
+      )}
+
+      {fotos && fotos.length > 0 && (
+        <div className="absolute bottom-2 right-2 px-2 py-1 rounded-full bg-black/60 text-white text-sm">
+          {currentImageIndex + 1}/{fotos.length}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PropertyCard({
   property,
   onEdit,
@@ -50,31 +130,11 @@ function PropertyCard({
   onEdit: (prop: Property) => void;
   onDelete: (id: number) => void;
 }) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const nextImage = () => {
-    if (property.fotos && property.fotos.length > 0) {
-      setCurrentImageIndex((prev) =>
-        prev === property.fotos!.length - 1 ? 0 : prev + 1
-      );
-    }
-  };
-
-  const previousImage = () => {
-    if (property.fotos && property.fotos.length > 0) {
-      setCurrentImageIndex((prev) =>
-        prev === 0 ? property.fotos!.length - 1 : prev - 1
-      );
-    }
-  };
-
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', {
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     });
-  };
 
   const getPropertyIcon = (tipo_imovel: string) => {
     switch (tipo_imovel.toLowerCase()) {
@@ -94,48 +154,8 @@ function PropertyCard({
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg">
       {/* Galeria de Imagens */}
-      <div className="relative h-64">
-        {isLoading && (
-          <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
-            <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
-          </div>
-        )}
-        <img
-          src={
-            property.fotos && property.fotos[currentImageIndex]
-              ? `http://127.0.0.1:8000/storage/${property.fotos[currentImageIndex]}`
-              : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1073&q=80'
-          }
-          alt={property.descricao || 'Imagem do imóvel'}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          onLoad={() => setIsLoading(false)}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-        {property.fotos && property.fotos.length > 1 && (
-          <>
-            <button
-              onClick={previousImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-            >
-              <ChevronLeft className="h-5 w-5 text-gray-800" />
-            </button>
-            <button
-              onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-            >
-              <ChevronRight className="h-5 w-5 text-gray-800" />
-            </button>
-          </>
-        )}
-
-        {property.fotos && property.fotos.length > 0 && (
-          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-full bg-black/60 text-white text-sm">
-            {currentImageIndex + 1}/{property.fotos.length}
-          </div>
-        )}
-
+      <div className="relative">
+        <ImageGallery fotos={property.fotos} descricao={property.descricao} />
         <div className="absolute top-2 left-2 px-3 py-1 rounded-full bg-white/90 text-gray-800 font-medium text-sm flex items-center gap-1">
           {getPropertyIcon(property.tipo_imovel)}
           <span className="capitalize">{property.tipo_imovel}</span>
@@ -169,7 +189,9 @@ function PropertyCard({
           <MapPin className="h-5 w-5 mt-1 flex-shrink-0" />
           <p>{property.endereco}</p>
         </div>
-        <p className="text-gray-600 mb-6 line-clamp-2">{property.descricao}</p>
+        <p className="text-gray-600 mb-6 line-clamp-2">
+          {property.descricao}
+        </p>
 
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -207,22 +229,42 @@ function PropertyCard({
         <div className="flex gap-2">
           <button
             onClick={() => onEdit(property)}
+            aria-label="Editar imóvel"
+            title="Editar imóvel"
             className="flex-1 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-1 group"
           >
-            <Edit className="h-4 w-4 group-hover:scale-110 transition-transform" /> 
+            <Edit className="h-4 w-4 group-hover:scale-110 transition-transform" />
             Editar
           </button>
           <button
             onClick={() => onDelete(property.id)}
+            aria-label="Excluir imóvel"
+            title="Excluir imóvel"
             className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-1 group"
           >
-            <Trash2 className="h-4 w-4 group-hover:scale-110 transition-transform" /> 
+            <Trash2 className="h-4 w-4 group-hover:scale-110 transition-transform" />
             Excluir
           </button>
         </div>
       </div>
     </div>
   );
+}
+
+interface EditFormData {
+  tipo_imovel: string;
+  cep: string;
+  endereco: string;
+  estado: string;
+  cidade: string;
+  area: number;
+  quartos: number;
+  banheiros: number;
+  descricao: string;
+  valor_agio: number;
+  valor_parcela_atual: number;
+  parcelas_restantes: number;
+  valor_total_financiado: number;
 }
 
 function EditPropertyModal({
@@ -234,34 +276,73 @@ function EditPropertyModal({
   onClose: () => void;
   onSave: (updated: Property) => void;
 }) {
-  const [formData, setFormData] = useState({
-    tipo_imovel: property.tipo_imovel,
-    cep: property.cep,
-    endereco: property.endereco,
-    complemento: '',
-    estado: property.estado,
-    cidade: property.cidade,
-    area: property.area,
-    quartos: property.quartos,
-    banheiros: property.banheiros,
-    descricao: property.descricao,
-    valor_agio: property.valor_agio,
-    valor_parcela_atual: property.valor_parcela_atual,
-    parcelas_restantes: property.parcelas_restantes,
-    valor_total_financiado: property.valor_total_financiado,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<EditFormData>({
+    defaultValues: {
+      tipo_imovel: property.tipo_imovel,
+      cep: property.cep,
+      endereco: property.endereco,
+      estado: property.estado,
+      cidade: property.cidade,
+      area: property.area,
+      quartos: property.quartos,
+      banheiros: property.banheiros,
+      descricao: property.descricao,
+      valor_agio: property.valor_agio,
+      valor_parcela_atual: property.valor_parcela_atual,
+      parcelas_restantes: property.parcelas_restantes,
+      valor_total_financiado: property.valor_total_financiado,
+    },
   });
 
   const [newPhotos, setNewPhotos] = useState<FileList | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const value =
-      e.target.type === 'number' ? parseFloat(e.target.value) : e.target.value;
-    setFormData({ ...formData, [e.target.name]: value });
+  const onSubmit = async (data: EditFormData) => {
+    const formData = new FormData();
+    // Adiciona o _method para que o Laravel trate a requisição como PUT
+    formData.append('_method', 'PUT');
+
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value.toString());
+    });
+
+    // Use a chave "fotos[]" para enviar os arquivos como array
+    if (newPhotos) {
+      Array.from(newPhotos).forEach((file) => {
+        formData.append('fotos[]', file);
+      });
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/imoveis/${property.id}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+          body: formData,
+        }
+      );
+
+      if (res.ok) {
+        const updated = await res.json();
+        onSave(updated.imovel);
+        toast.success('Imóvel atualizado com sucesso!');
+        onClose();
+      } else {
+        toast.error('Erro ao atualizar o imóvel.');
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      toast.error('Erro ao atualizar o imóvel.');
+    }
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,69 +351,64 @@ function EditPropertyModal({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const data = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== '') {
-          data.append(key, value.toString());
-        }
-      });
-
-      if (newPhotos) {
-        Array.from(newPhotos).forEach((file) => {
-          data.append('fotos', file);
-        });
-      }
-
-      const token = localStorage.getItem('token');
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/imoveis/${property.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
-          body: data,
-        }
+  // Exibe as imagens atuais do imóvel para referência
+  const renderCurrentImages = () => {
+    if (property.fotos && property.fotos.length > 0) {
+      return (
+        <div className="flex gap-2 flex-wrap">
+          {property.fotos.map((foto, index) => (
+            <img
+              key={index}
+              src={`http://127.0.0.1:8000/storage/${foto}`}
+              alt={`Imagem ${index + 1}`}
+              className="w-20 h-20 object-cover rounded border"
+            />
+          ))}
+        </div>
       );
-
-      if (res.ok) {
-        const updated = await res.json();
-        onSave(updated.imovel);
-        onClose();
-      } else {
-        console.error('Erro ao atualizar imóvel');
-      }
-    } catch (error) {
-      console.error('Erro:', error);
-    } finally {
-      setIsSubmitting(false);
     }
+    return null;
   };
+
+  // Reinicia os valores do formulário sempre que a propriedade for alterada
+  useEffect(() => {
+    reset({
+      tipo_imovel: property.tipo_imovel,
+      cep: property.cep,
+      endereco: property.endereco,
+      estado: property.estado,
+      cidade: property.cidade,
+      area: property.area,
+      quartos: property.quartos,
+      banheiros: property.banheiros,
+      descricao: property.descricao,
+      valor_agio: property.valor_agio,
+      valor_parcela_atual: property.valor_parcela_atual,
+      parcelas_restantes: property.parcelas_restantes,
+      valor_total_financiado: property.valor_total_financiado,
+    });
+  }, [property, reset]);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-lg relative shadow-lg max-h-[90vh] overflow-y-auto">
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
+          aria-label="Fechar modal"
+          title="Fechar modal"
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 transition-colors"
         >
           <XCircle className="h-6 w-6" />
         </button>
         <h2 className="text-2xl font-bold mb-4">Editar Imóvel</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Tipo de Imóvel</label>
+              <label className="block text-sm font-medium mb-1">
+                Tipo de Imóvel
+              </label>
               <select
-                name="tipo_imovel"
-                value={formData.tipo_imovel}
-                onChange={handleChange}
+                {...register('tipo_imovel', { required: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               >
                 <option value="Apartamento">Apartamento</option>
@@ -340,16 +416,20 @@ function EditPropertyModal({
                 <option value="Terreno">Terreno</option>
                 <option value="Comercial">Comercial</option>
               </select>
+              {errors.tipo_imovel && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">CEP</label>
               <input
                 type="text"
-                name="cep"
-                value={formData.cep}
-                onChange={handleChange}
+                {...register('cep', { required: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.cep && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
           </div>
 
@@ -357,11 +437,12 @@ function EditPropertyModal({
             <label className="block text-sm font-medium mb-1">Endereço</label>
             <input
               type="text"
-              name="endereco"
-              value={formData.endereco}
-              onChange={handleChange}
+              {...register('endereco', { required: true })}
               className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
             />
+            {errors.endereco && (
+              <span className="text-red-500 text-xs">Campo obrigatório</span>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -369,116 +450,152 @@ function EditPropertyModal({
               <label className="block text-sm font-medium mb-1">Estado</label>
               <input
                 type="text"
-                name="estado"
-                value={formData.estado}
-                onChange={handleChange}
+                {...register('estado', { required: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.estado && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Cidade</label>
               <input
                 type="text"
-                name="cidade"
-                value={formData.cidade}
-                onChange={handleChange}
+                {...register('cidade', { required: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.cidade && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Área (m²)</label>
+              <label className="block text-sm font-medium mb-1">
+                Área (m²)
+              </label>
               <input
                 type="number"
-                name="area"
-                value={formData.area}
-                onChange={handleChange}
+                {...register('area', { required: true, valueAsNumber: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.area && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Quartos</label>
+              <label className="block text-sm font-medium mb-1">
+                Quartos
+              </label>
               <input
                 type="number"
-                name="quartos"
-                value={formData.quartos}
-                onChange={handleChange}
+                {...register('quartos', { required: true, valueAsNumber: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.quartos && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Banheiros</label>
+              <label className="block text-sm font-medium mb-1">
+                Banheiros
+              </label>
               <input
                 type="number"
-                name="banheiros"
-                value={formData.banheiros}
-                onChange={handleChange}
+                {...register('banheiros', { required: true, valueAsNumber: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.banheiros && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Descrição</label>
+            <label className="block text-sm font-medium mb-1">
+              Descrição
+            </label>
             <textarea
-              name="descricao"
-              value={formData.descricao}
-              onChange={handleChange}
+              {...register('descricao', { required: true })}
               rows={4}
               className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
             />
+            {errors.descricao && (
+              <span className="text-red-500 text-xs">Campo obrigatório</span>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Valor Ágio</label>
+              <label className="block text-sm font-medium mb-1">
+                Valor Ágio
+              </label>
               <input
                 type="number"
-                name="valor_agio"
-                value={formData.valor_agio}
-                onChange={handleChange}
+                {...register('valor_agio', { required: true, valueAsNumber: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.valor_agio && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Parcela Atual</label>
+              <label className="block text-sm font-medium mb-1">
+                Parcela Atual
+              </label>
               <input
                 type="number"
-                name="valor_parcela_atual"
-                value={formData.valor_parcela_atual}
-                onChange={handleChange}
+                {...register('valor_parcela_atual', { required: true, valueAsNumber: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.valor_parcela_atual && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Parcelas Restantes</label>
+              <label className="block text-sm font-medium mb-1">
+                Parcelas Restantes
+              </label>
               <input
                 type="number"
-                name="parcelas_restantes"
-                value={formData.parcelas_restantes}
-                onChange={handleChange}
+                {...register('parcelas_restantes', { required: true, valueAsNumber: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.parcelas_restantes && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Valor Total Financiado</label>
+              <label className="block text-sm font-medium mb-1">
+                Valor Total Financiado
+              </label>
               <input
                 type="number"
-                name="valor_total_financiado"
-                value={formData.valor_total_financiado}
-                onChange={handleChange}
+                {...register('valor_total_financiado', { required: true, valueAsNumber: true })}
                 className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
+              {errors.valor_total_financiado && (
+                <span className="text-red-500 text-xs">Campo obrigatório</span>
+              )}
             </div>
+          </div>
+
+          {/* Exibe as imagens atuais do imóvel */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Imagens Atuais
+            </label>
+            {renderCurrentImages()}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Nova(s) Foto(s)</label>
+            <label className="block text-sm font-medium mb-1">
+              Nova(s) Foto(s)
+            </label>
             <input
               type="file"
               name="fotos"
@@ -519,11 +636,7 @@ export default function MeusImoveisPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
-  async function fetchProperties() {
+  const fetchProperties = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch('http://127.0.0.1:8000/api/meus-imoveis', {
@@ -534,57 +647,67 @@ export default function MeusImoveisPage() {
       if (res.ok) {
         const data = await res.json();
         setProperties(data);
+      } else {
+        toast.error('Erro ao buscar imóveis.');
       }
     } catch (error) {
       console.error('Erro ao buscar imóveis:', error);
+      toast.error('Erro ao buscar imóveis.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
 
-  const filteredProperties = properties.filter((property) => {
-    const matchesSearch =
-      property.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.endereco.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (property.estado &&
-        property.estado.toLowerCase().includes(searchTerm.toLowerCase()));
+  useEffect(() => {
+    fetchProperties();
+  }, [fetchProperties]);
 
-    const matchesType =
-      propertyType === 'all' ||
-      property.tipo_imovel.toLowerCase() === propertyType.toLowerCase();
+  const filteredProperties = useMemo(() => {
+    return properties.filter((property) => {
+      const matchesSearch =
+        property.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.endereco.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (property.estado &&
+          property.estado.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesType =
+        propertyType === 'all' ||
+        property.tipo_imovel.toLowerCase() === propertyType.toLowerCase();
+      return matchesSearch && matchesType;
+    });
+  }, [properties, searchTerm, propertyType]);
 
-    return matchesSearch && matchesType;
-  });
-
-  const sortedProperties = [...filteredProperties].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-asc':
-        return a.valor_total_financiado - b.valor_total_financiado;
-      case 'price-desc':
-        return b.valor_total_financiado - a.valor_total_financiado;
-      case 'area-asc':
-        return a.area - b.area;
-      case 'area-desc':
-        return b.area - a.area;
-      default:
-        return 0;
-    }
-  });
+  const sortedProperties = useMemo(() => {
+    return [...filteredProperties].sort((a, b) => {
+      switch (sortBy) {
+        case 'price-asc':
+          return a.valor_total_financiado - b.valor_total_financiado;
+        case 'price-desc':
+          return b.valor_total_financiado - a.valor_total_financiado;
+        case 'area-asc':
+          return a.area - b.area;
+        case 'area-desc':
+          return b.area - a.area;
+        default:
+          return 0;
+      }
+    });
+  }, [filteredProperties, sortBy]);
 
   const totalPages = Math.ceil(sortedProperties.length / itemsPerPage);
-  const paginatedProperties = sortedProperties.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedProperties = useMemo(() => {
+    return sortedProperties.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+  }, [sortedProperties, currentPage]);
 
-  const handleEdit = (property: Property) => {
+  const handleEdit = useCallback((property: Property) => {
     setEditingProperty(property);
-  };
+  }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!window.confirm('Tem certeza que deseja excluir este imóvel?')) return;
-
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`http://127.0.0.1:8000/api/imoveis/${id}`, {
@@ -593,24 +716,27 @@ export default function MeusImoveisPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (res.ok) {
-        setProperties((prev) => prev.filter((property) => property.id !== id));
+        setProperties((prev) =>
+          prev.filter((property) => property.id !== id)
+        );
+        toast.success('Imóvel excluído com sucesso!');
       } else {
-        console.error('Erro ao excluir o imóvel.');
+        toast.error('Erro ao excluir o imóvel.');
       }
     } catch (error) {
       console.error('Erro ao excluir o imóvel:', error);
+      toast.error('Erro ao excluir o imóvel.');
     }
-  };
+  }, []);
 
-  const handleSave = (updatedProperty: Property) => {
+  const handleSave = useCallback((updatedProperty: Property) => {
     setProperties((prev) =>
       prev.map((property) =>
         property.id === updatedProperty.id ? updatedProperty : property
       )
     );
-  };
+  }, []);
 
   if (isLoading) {
     return (
@@ -632,6 +758,7 @@ export default function MeusImoveisPage() {
       </header>
 
       <div className="container mx-auto px-4 py-6">
+        {/* Painel de filtros */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
@@ -640,7 +767,10 @@ export default function MeusImoveisPage() {
                 type="text"
                 placeholder="Buscar por cidade, endereço..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
               />
             </div>
@@ -649,7 +779,10 @@ export default function MeusImoveisPage() {
               <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <select
                 value={propertyType}
-                onChange={(e) => setPropertyType(e.target.value)}
+                onChange={(e) => {
+                  setPropertyType(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent appearance-none"
               >
                 <option value="all">Todos os tipos</option>
@@ -664,7 +797,10 @@ export default function MeusImoveisPage() {
               <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                onChange={(e) => {
+                  setSortBy(e.target.value as typeof sortBy);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent appearance-none"
               >
                 <option value="price-desc">Maior preço</option>
@@ -696,30 +832,41 @@ export default function MeusImoveisPage() {
             {totalPages > 1 && (
               <div className="flex justify-center mt-8 gap-2">
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
+                  aria-label="Página anterior"
                   className="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
                 >
                   Anterior
                 </button>
                 <div className="flex items-center gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-10 h-10 rounded-lg ${
-                        currentPage === page
-                          ? 'bg-[#3EA76F] text-white'
-                          : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                      } transition-colors`}
-                    >
-                      {page}
-                    </button>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        aria-label={`Página ${page}`}
+                        className={`w-10 h-10 rounded-lg ${
+                          currentPage === page
+                            ? 'bg-[#3EA76F] text-white'
+                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                        } transition-colors`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
                 </div>
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      Math.min(prev + 1, totalPages)
+                    )
+                  }
                   disabled={currentPage === totalPages}
+                  aria-label="Próxima página"
                   className="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
                 >
                   Próxima
@@ -737,6 +884,8 @@ export default function MeusImoveisPage() {
           onSave={handleSave}
         />
       )}
+
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </div>
   );
 }
