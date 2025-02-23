@@ -1,4 +1,8 @@
-import { notFound } from "next/navigation";
+// app/exibir-imoveis/[id]/page.tsx
+
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface Property {
   id: number;
@@ -8,63 +12,97 @@ interface Property {
   banheiros: number;
   endereco: string;
   descricao: string;
-  fotos: string[];
+  fotos?: string[];
   valor_agio: number;
   valor_parcela_atual: number;
   parcelas_restantes: number;
   valor_total_financiado: number;
+  cep: string;
+  cidade: string;
 }
 
-// 🚀 Função para pré-gerar as páginas estáticas (SSR)
+// Gera os parâmetros estáticos para cada rota dinâmica
 export async function generateStaticParams() {
   const res = await fetch("http://127.0.0.1:8000/api/imoveis");
-  const properties = await res.json();
+  const properties: Property[] = await res.json();
 
-  console.log("📌 Lista de imóveis para geração estática:", properties);
-
-  return properties.map((property: any) => ({
+  return properties.map((property) => ({
     id: property.id.toString(),
   }));
 }
 
-
-// 🚀 Função para buscar detalhes do imóvel no servidor
-export async function getProperty(id: string) {
+// Função auxiliar para buscar os dados do imóvel utilizando o endpoint público
+async function getProperty(id: string): Promise<Property | null> {
   try {
-    const res = await fetch(`http://127.0.0.1:8000/api/imoveis/${id}`, {
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      console.error(`Erro ao buscar imóvel ${id}: Status ${res.status}`);
-      return null;
-    }
-
-    return await res.json();
+    // Faz a requisição para a rota pública de listagem
+    const res = await fetch("http://127.0.0.1:8000/api/imoveis");
+    if (!res.ok) return null;
+    const properties: Property[] = await res.json();
+    // Encontra o imóvel com o id correspondente
+    const property = properties.find((prop) => prop.id.toString() === id) || null;
+    return property;
   } catch (error) {
-    console.error("Erro ao buscar imóvel:", error);
+    console.error(error);
     return null;
   }
 }
 
-
-
-// Página principal sem "use client"
-export default async function PropertyDetailsPage({ params }: { params: { id: string } }) {
+// Componente de detalhes do imóvel (Server Component)
+export default async function PropertyDetails({
+  params,
+}: {
+  params: { id: string };
+}) {
   const property = await getProperty(params.id);
 
-  if (!property) return notFound(); // Exibe erro 404 se o imóvel não for encontrado
+  if (!property) {
+    return <p>Imóvel não encontrado.</p>;
+  }
 
   return (
-    <div className="min-h-screen pt-20">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold">{property.tipo_imovel}</h1>
-        <p className="text-gray-600">{property.endereco}</p>
-        <ClientComponent property={property} />
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">{property.tipo_imovel}</h1>
+      <p>
+        {property.endereco} - {property.cidade} / {property.cep}
+      </p>
+
+      {property.fotos && property.fotos.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+          {property.fotos.map((foto, index) => (
+            <Image
+              key={index}
+              src={`http://127.0.0.1:8000/storage/${foto}`}
+              alt={`Foto ${index + 1}`}
+              width={500}
+              height={300}
+              className="object-cover"
+            />
+          ))}
+        </div>
+      )}
+
+      <p className="mt-4">{property.descricao}</p>
+
+      <div className="mt-4">
+        <h2 className="text-xl font-semibold mb-2">Detalhes</h2>
+        <p>Área: {property.area} m²</p>
+        <p>Quartos: {property.quartos}</p>
+        <p>Banheiros: {property.banheiros}</p>
+        <p>Valor do Ágio: R$ {property.valor_agio.toLocaleString()}</p>
+        <p>
+          Parcela Atual: R$ {property.valor_parcela_atual.toLocaleString()} /mês
+        </p>
+        <p>Parcelas Restantes: {property.parcelas_restantes}</p>
+        <p>
+          Valor Total Financiado: R$ {property.valor_total_financiado.toLocaleString()}
+        </p>
+      </div>
+
+      <div className="mt-4">
+        <Link href="/" passHref>
+          <Button>Voltar</Button>
+        </Link>
       </div>
     </div>
   );
 }
-
-// Importa o componente do cliente
-import ClientComponent from "./ClientComponent";
