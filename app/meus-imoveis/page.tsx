@@ -44,7 +44,7 @@ interface Property {
   valor_total_financiado: number;
 }
 
-// Componente responsável pela galeria de imagens
+// Componente responsável pela galeria de imagens (mesmo código)
 function ImageGallery({
   fotos,
   descricao,
@@ -299,7 +299,63 @@ function EditPropertyModal({
     },
   });
 
+  // Estado para gerenciar as imagens atuais (que poderão ser removidas)
+  const [currentImages, setCurrentImages] = useState<string[]>(property.fotos || []);
   const [newPhotos, setNewPhotos] = useState<FileList | null>(null);
+
+  // Atualiza o estado de currentImages quando a propriedade mudar
+  useEffect(() => {
+    setCurrentImages(property.fotos || []);
+    reset({
+      tipo_imovel: property.tipo_imovel,
+      cep: property.cep,
+      endereco: property.endereco,
+      estado: property.estado,
+      cidade: property.cidade,
+      area: property.area,
+      quartos: property.quartos,
+      banheiros: property.banheiros,
+      descricao: property.descricao,
+      valor_agio: property.valor_agio,
+      valor_parcela_atual: property.valor_parcela_atual,
+      parcelas_restantes: property.parcelas_restantes,
+      valor_total_financiado: property.valor_total_financiado,
+    });
+  }, [property, reset]);
+
+  // Função para remover uma imagem do array currentImages
+  const removeImage = (index: number) => {
+    setCurrentImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Função para renderizar as imagens atuais com botão de exclusão
+  const renderCurrentImages = () => {
+    if (currentImages.length > 0) {
+      return (
+        <div className="flex gap-2 flex-wrap">
+          {currentImages.map((foto, index) => (
+            <div key={index} className="relative w-20 h-20">
+              <img
+                src={`http://127.0.0.1:8000/storage/${foto}`}
+                alt={`Imagem ${index + 1}`}
+                className="w-full h-full object-cover rounded border"
+              />
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                title="Excluir imagem"
+                aria-label="Excluir imagem"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return <p className="text-sm text-gray-500">Nenhuma imagem cadastrada.</p>;
+  };
 
   const onSubmit = async (data: EditFormData) => {
     const formData = new FormData();
@@ -310,7 +366,10 @@ function EditPropertyModal({
       formData.append(key, value.toString());
     });
 
-    // Use a chave "fotos[]" para enviar os arquivos como array
+    // Envia as imagens que o usuário deseja manter (currentImages)
+    formData.append('fotos_keep', JSON.stringify(currentImages));
+
+    // Usa a chave "fotos[]" para enviar os novos arquivos (se houver)
     if (newPhotos) {
       Array.from(newPhotos).forEach((file) => {
         formData.append('fotos[]', file);
@@ -350,44 +409,6 @@ function EditPropertyModal({
       setNewPhotos(e.target.files);
     }
   };
-
-  // Exibe as imagens atuais do imóvel para referência
-  const renderCurrentImages = () => {
-    if (property.fotos && property.fotos.length > 0) {
-      return (
-        <div className="flex gap-2 flex-wrap">
-          {property.fotos.map((foto, index) => (
-            <img
-              key={index}
-              src={`http://127.0.0.1:8000/storage/${foto}`}
-              alt={`Imagem ${index + 1}`}
-              className="w-20 h-20 object-cover rounded border"
-            />
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Reinicia os valores do formulário sempre que a propriedade for alterada
-  useEffect(() => {
-    reset({
-      tipo_imovel: property.tipo_imovel,
-      cep: property.cep,
-      endereco: property.endereco,
-      estado: property.estado,
-      cidade: property.cidade,
-      area: property.area,
-      quartos: property.quartos,
-      banheiros: property.banheiros,
-      descricao: property.descricao,
-      valor_agio: property.valor_agio,
-      valor_parcela_atual: property.valor_parcela_atual,
-      parcelas_restantes: property.parcelas_restantes,
-      valor_total_financiado: property.valor_total_financiado,
-    });
-  }, [property, reset]);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -584,7 +605,7 @@ function EditPropertyModal({
             </div>
           </div>
 
-          {/* Exibe as imagens atuais do imóvel */}
+          {/* Seção para exibir as imagens atuais com botão de exclusão */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Imagens Atuais
