@@ -10,6 +10,7 @@ import HowItWorks from "@/components/how-it-works";
 import HeroCarousel from "@/components/hero-carousel";
 import StatsSection from "@/components/ui/stats-section";
 import TestimonialsSection from "@/components/ui/testimonials-section";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -37,7 +38,9 @@ export default function Home() {
       {/* Latest Properties */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Últimas Oportunidades</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            Últimas Oportunidades
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* {[1, 2, 3, 4, 5, 6].map((i) => (
               <PropertyCard key={i} />
@@ -50,10 +53,15 @@ export default function Home() {
       <section className="py-16 bg-[#3EA76F]">
         <div className="container mx-auto px-4 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Quer Anunciar Seu Imóvel?</h2>
-          <p className="text-xl mb-8">Cadastre-se gratuitamente e alcance milhares de compradores interessados</p>
-          <Button size="lg" variant="secondary">
-            Anunciar Agora
-          </Button>
+          <p className="text-xl mb-8">
+            Cadastre-se gratuitamente e alcance milhares de compradores
+            interessados
+          </p>
+          <Link href={`/anunciar`}>
+            <Button size="lg" variant="secondary">
+              Anunciar Agora
+            </Button>
+          </Link>
         </div>
       </section>
     </div>

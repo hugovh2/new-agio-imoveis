@@ -1,30 +1,28 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { 
   Menu, Bell, MessageSquare, ChevronRight, Edit2, Mail, Phone, Calendar 
-} from 'lucide-react';
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { randomAvatar } from '@/lib/utils';
+import { randomAvatar } from "@/lib/utils";
 
-// Exemplo de definição de interface para o usuário, atualize conforme sua aplicação
 interface User {
   id: number;
   name: string;
   email: string;
   telefone?: string;
-  avatar?: string; // Propriedade adicionada
+  avatar?: string;
   role: string;
   created_at: string;
 }
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // Realize o cast para garantir que o 'user' siga a interface atualizada
   const { user } = useAuth() as { user: User | null };
 
   useEffect(() => {
-    // Pode adicionar lógica se necessário
+    // Lógica adicional se necessário
   }, [user]);
 
   if (!user) {
@@ -37,7 +35,6 @@ function App() {
     );
   }
 
-  // Agora o TypeScript reconhece a propriedade avatar
   const avatar = user.avatar ? user.avatar : randomAvatar();
 
   return (
@@ -68,7 +65,11 @@ function App() {
 
       <div className="pt-16 flex">
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 left-0 bg-white border-r border-gray-200 transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:w-64`}>
+        <aside
+          className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 transition-transform duration-300 transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:relative md:translate-x-0`}
+        >
           <div className="p-6">
             <div className="flex flex-col items-center">
               <div className="relative">
@@ -87,7 +88,13 @@ function App() {
 
             <nav className="mt-8">
               <ul className="space-y-2">
-                {['Visão Geral', 'Meus Imóveis', 'Mensagens', 'Calendário', 'Configurações'].map((item) => (
+                {[
+                  "Visão Geral",
+                  "Meus Imóveis",
+                  "Mensagens",
+                  "Calendário",
+                  "Configurações"
+                ].map((item) => (
                   <li key={item}>
                     <button className="w-full p-3 flex items-center justify-between rounded-lg hover:bg-gray-50 transition-colors">
                       <span className="text-gray-700">{item}</span>
@@ -103,7 +110,7 @@ function App() {
         {/* Overlay para mobile */}
         {isSidebarOpen && (
           <div 
-            className="fixed inset-0 bg-black opacity-50 md:hidden" 
+            className="fixed inset-0 bg-black opacity-50 md:hidden"
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
@@ -127,7 +134,7 @@ function App() {
                   <div className="flex items-center space-x-3">
                     <Calendar className="h-5 w-5 text-[#3EA76F]" />
                     <span className="text-gray-600">
-                      Membro desde {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                      Membro desde {new Date(user.created_at).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
                 </div>
@@ -137,11 +144,11 @@ function App() {
               <div className="bg-white p-6 rounded-xl shadow-sm">
                 <h3 className="text-lg font-semibold mb-4">Estatísticas</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {[ 
-                    { label: 'Imóveis Ativos', value: '12' },
-                    { label: 'Visitas Agendadas', value: '8' },
-                    { label: 'Propostas', value: '5' },
-                    { label: 'Avaliações', value: '4.8' }
+                  {[
+                    { label: "Imóveis Ativos", value: "12" },
+                    { label: "Visitas Agendadas", value: "8" },
+                    { label: "Propostas", value: "5" },
+                    { label: "Avaliações", value: "4.8" }
                   ].map((stat) => (
                     <div key={stat.label} className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600">{stat.label}</p>
@@ -156,10 +163,10 @@ function App() {
                 <h3 className="text-lg font-semibold mb-4">Ações Rápidas</h3>
                 <div className="space-y-3">
                   {[
-                    { label: 'Adicionar Novo Imóvel', link: '/anunciar' },
-                    { label: 'Agendar Visita', link: '#' },
-                    { label: 'Ver Mensagens', link: '#' },
-                    { label: 'Editar Perfil', link: '#' }
+                    { label: "Adicionar Novo Imóvel", link: "/anunciar" },
+                    { label: "Agendar Visita", link: "#" },
+                    { label: "Ver Mensagens", link: "#" },
+                    { label: "Editar Perfil", link: "#" }
                   ].map(({ label, link }) => (
                     <a
                       key={label}
