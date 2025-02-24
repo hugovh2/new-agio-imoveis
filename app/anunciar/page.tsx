@@ -10,30 +10,9 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function AnunciarPage() {
   const router = useRouter();
+
+  // Hook de autenticação
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-
-  // Verifica se o usuário está logado e, se não estiver, exibe uma tela de loading e, após 2 segundos, mostra o toast e redireciona para a página de login.
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      setTimeout(() => {
-        toast.error("Você precisa estar logado para anunciar.");
-        router.push("/auth/login");
-      }, 2000);
-    } else {
-      setIsLoadingAuth(false);
-    }
-  }, [router]);
-
-  // Enquanto estiver verificando o login, exibe uma tela de loading.
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <Loader2 className="animate-spin h-10 w-10 text-[#3EA76F]" />
-        <p className="mt-4 text-lg">Verificando autenticação, aguarde...</p>
-      </div>
-    );
-  }
 
   // Estado para gerenciar a etapa atual (1 a 4)
   const [step, setStep] = useState(1);
@@ -59,7 +38,30 @@ export default function AnunciarPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Atualiza os campos padrão do formulário
+  // Verifica se o usuário está logado
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setTimeout(() => {
+        toast.error("Você precisa estar logado para anunciar.");
+        router.push("/auth/login");
+      }, 2000);
+    } else {
+      setIsLoadingAuth(false);
+    }
+  }, [router]);
+
+  // Enquanto estiver verificando a autenticação, exibe a tela de loading
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin h-10 w-10 text-[#3EA76F]" />
+        <p className="mt-4 text-lg">Verificando autenticação, aguarde...</p>
+      </div>
+    );
+  }
+
+  // Função para atualizar os campos do formulário
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -69,7 +71,7 @@ export default function AnunciarPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Consulta a API ViaCEP para preencher automaticamente os dados do endereço a partir do CEP
+  // Consulta a API ViaCEP para preencher os dados do endereço
   const handleCepBlur = async () => {
     const cep = formData.cep.replace(/\D/g, "");
     if (cep.length === 8) {
@@ -94,7 +96,7 @@ export default function AnunciarPage() {
     }
   };
 
-  // Trata a seleção de arquivos e permite múltiplos uploads, acumulando as imagens selecionadas
+  // Trata a seleção de arquivos
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -136,7 +138,6 @@ export default function AnunciarPage() {
 
       if (response.ok) {
         toast.success("Anúncio enviado com sucesso!");
-        // Redireciona para a página "Meus Anúncios"
         router.push("/meus-imoveis");
       } else {
         const errorData = await response.json();
@@ -199,7 +200,6 @@ export default function AnunciarPage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold mb-6">Dados do Imóvel</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Tipo de Imóvel */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Tipo de Imóvel
@@ -216,7 +216,6 @@ export default function AnunciarPage() {
                       <option>Comercial</option>
                     </select>
                   </div>
-                  {/* Área */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Área (m²)
@@ -229,7 +228,6 @@ export default function AnunciarPage() {
                       onChange={handleInputChange}
                     />
                   </div>
-                  {/* Quartos */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Quartos
@@ -242,7 +240,6 @@ export default function AnunciarPage() {
                       onChange={handleInputChange}
                     />
                   </div>
-                  {/* Banheiros */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Banheiros
@@ -256,7 +253,6 @@ export default function AnunciarPage() {
                     />
                   </div>
                 </div>
-                {/* Descrição */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Descrição
@@ -280,7 +276,6 @@ export default function AnunciarPage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold mb-6">Dados do Endereço</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* CEP */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       CEP
@@ -294,7 +289,6 @@ export default function AnunciarPage() {
                       onBlur={handleCepBlur}
                     />
                   </div>
-                  {/* Endereço */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Endereço
@@ -307,7 +301,6 @@ export default function AnunciarPage() {
                       onChange={handleInputChange}
                     />
                   </div>
-                  {/* Complemento */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Complemento
@@ -320,7 +313,6 @@ export default function AnunciarPage() {
                       onChange={handleInputChange}
                     />
                   </div>
-                  {/* Estado */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Estado
@@ -333,7 +325,6 @@ export default function AnunciarPage() {
                       onChange={handleInputChange}
                     />
                   </div>
-                  {/* Cidade */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Cidade
@@ -381,7 +372,6 @@ export default function AnunciarPage() {
                     style={{ display: "none" }}
                   />
                 </div>
-                {/* Exibição das pré-visualizações das imagens selecionadas */}
                 {formData.fotos.length > 0 && (
                   <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {formData.fotos.map((file, index) => (
