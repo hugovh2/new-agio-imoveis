@@ -34,7 +34,8 @@ export default function SearchPage() {
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [priceRange, setPriceRange] = useState([0, 500000]);
-  const [areaRange, setAreaRange] = useState([0, 1000]);
+  // Alterado: aumenta o valor máximo do filtro de área para 5000
+  const [areaRange, setAreaRange] = useState([0, 5000]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
     location: filterLocation,
@@ -297,9 +298,10 @@ export default function SearchPage() {
                     <label className="text-sm font-medium text-gray-700">
                       Área (m²)
                     </label>
+                    {/* Alterado: atualiza o slider para área com max 5000 */}
                     <Slider
-                      defaultValue={[0, 1000]}
-                      max={1000}
+                      defaultValue={[0, 5000]}
+                      max={5000}
                       step={10}
                       value={areaRange}
                       onValueChange={setAreaRange}
@@ -333,6 +335,7 @@ export default function SearchPage() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
+                {/* Conteúdo dos filtros mobile (idem desktop) */}
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
@@ -417,8 +420,8 @@ export default function SearchPage() {
                       Área (m²)
                     </label>
                     <Slider
-                      defaultValue={[0, 1000]}
-                      max={1000}
+                      defaultValue={[0, 5000]}
+                      max={5000}
                       step={10}
                       value={areaRange}
                       onValueChange={setAreaRange}
