@@ -1,23 +1,22 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import Header from '@/components/header';
-import Footer from '@/components/footer';
-import WhatsAppButton from '@/components/whatsapp-button';
-import { AuthProvider } from '@/context/AuthContext';
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import WhatsAppButton from "@/components/whatsapp-button";
+import { AuthProvider } from "@/context/AuthContext";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Ágio Imóveis | Seu Próximo Imóvel Está Aqui',
-  description: 'Encontre as melhores oportunidades de ágio de imóveis',
+  title: "Ágio Imóveis | Seu Próximo Imóvel Está Aqui",
+  description: "Encontre as melhores oportunidades de ágio de imóveis",
   icons: {
-    icon: '/favicon.ico', // Caminho padrão no Next.js
+    icon: "/favicon.ico",
   },
+  viewport: "width=device-width, initial-scale=1",
 };
-
-
 
 export default function RootLayout({
   children,
@@ -39,4 +38,3 @@ export default function RootLayout({
     </html>
   );
 }
-
