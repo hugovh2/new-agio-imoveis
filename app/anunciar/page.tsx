@@ -1,16 +1,39 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Camera, DollarSign, Home, Upload } from "lucide-react";
+import { Camera, DollarSign, Home, Upload, Loader2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function AnunciarPage() {
-  // Hook para redirecionamento
   const router = useRouter();
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
+  // Verifica se o usuário está logado e, se não estiver, exibe uma tela de loading e, após 2 segundos, mostra o toast e redireciona para a página de login.
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setTimeout(() => {
+        toast.error("Você precisa estar logado para anunciar.");
+        router.push("/auth/login");
+      }, 2000);
+    } else {
+      setIsLoadingAuth(false);
+    }
+  }, [router]);
+
+  // Enquanto estiver verificando o login, exibe uma tela de loading.
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin h-10 w-10 text-[#3EA76F]" />
+        <p className="mt-4 text-lg">Verificando autenticação, aguarde...</p>
+      </div>
+    );
+  }
 
   // Estado para gerenciar a etapa atual (1 a 4)
   const [step, setStep] = useState(1);
@@ -82,7 +105,7 @@ export default function AnunciarPage() {
   // Envia os dados para o backend via FormData
   const handleSubmit = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("authToken");
       const data = new FormData();
       data.append("tipo_imovel", formData.tipo_imovel);
       data.append("area", formData.area);
@@ -348,9 +371,7 @@ export default function AnunciarPage() {
                   >
                     Selecionar Arquivos
                   </Button>
-                  <p className="text-sm text-gray-500 mt-2">
-                    PNG, JPG até 5MB
-                  </p>
+                  <p className="text-sm text-gray-500 mt-2">PNG, JPG até 5MB</p>
                   <input
                     type="file"
                     multiple

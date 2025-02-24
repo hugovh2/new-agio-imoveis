@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/property-card";
 import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
-import { Search, MapPin, Filter, X } from "lucide-react";
+import { Search, MapPin, Filter, X, Loader2 } from "lucide-react";
 
 interface Property {
   id: number;
@@ -46,6 +46,9 @@ export default function SearchPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
+  // Estado para loading dos imóveis
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
@@ -65,6 +68,8 @@ export default function SearchPage() {
         }
       } catch (error) {
         console.error("Erro ao buscar imóveis:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchProperties();
@@ -139,6 +144,16 @@ export default function SearchPage() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  // Se estiver carregando os imóveis, exibe uma tela de loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin h-10 w-10 text-[#3EA76F]" />
+        <p className="mt-4 text-lg">Carregando imóveis...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-20">
@@ -220,8 +235,7 @@ export default function SearchPage() {
                       <option value="commercial">Comercial</option>
                     </select>
                   </div>
-
-                  {/* Quartos */}
+                  {/* Outros filtros (quartos, banheiros, etc.) */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Quartos
@@ -242,8 +256,6 @@ export default function SearchPage() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Banheiros */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Banheiros
@@ -252,9 +264,7 @@ export default function SearchPage() {
                       {["any", "1", "2", "3+"].map((value) => (
                         <button
                           key={value}
-                          onClick={() =>
-                            handleFilterChange("bathrooms", value)
-                          }
+                          onClick={() => handleFilterChange("bathrooms", value)}
                           className={`p-2 text-sm rounded-md border transition-colors ${
                             filters.bathrooms === value
                               ? "border-[#3EA76F] bg-[#3EA76F]/10 text-[#3EA76F]"
@@ -266,8 +276,6 @@ export default function SearchPage() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Valor do Ágio */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Valor do Ágio (R$)
@@ -285,8 +293,6 @@ export default function SearchPage() {
                       <span>R$ {priceRange[1].toLocaleString()}</span>
                     </div>
                   </div>
-
-                  {/* Área (m²) */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Área (m²)
@@ -328,7 +334,6 @@ export default function SearchPage() {
                   </button>
                 </div>
                 <div className="space-y-6">
-                  {/* Conteúdo dos filtros (mesmo do desktop) */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Tipo de Imóvel
@@ -346,7 +351,6 @@ export default function SearchPage() {
                       <option value="commercial">Comercial</option>
                     </select>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Quartos
@@ -369,7 +373,6 @@ export default function SearchPage() {
                       ))}
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Banheiros
@@ -392,7 +395,6 @@ export default function SearchPage() {
                       ))}
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Valor do Ágio (R$)
@@ -410,7 +412,6 @@ export default function SearchPage() {
                       <span>R$ {priceRange[1].toLocaleString()}</span>
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Área (m²)
