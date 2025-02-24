@@ -40,8 +40,8 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contato</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>contato@agioimoveis.com.br</li>
-              <li>(61) 9999-9999</li>
+              <li>proftcov@gmail.com</li>
+              <li>(61) 9811-6408</li>
               <li>Brasília, DF</li>
             </ul>
           </div>
