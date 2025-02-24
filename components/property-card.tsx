@@ -91,9 +91,7 @@ export default function PropertyCard({ property }: { property?: Property }) {
         >
           <Heart
             className={`w-5 h-5 ${
-              isFavorite
-                ? "fill-red-500 text-red-500"
-                : "text-gray-500"
+              isFavorite ? "fill-red-500 text-red-500" : "text-gray-500"
             }`}
           />
         </button>
@@ -103,9 +101,7 @@ export default function PropertyCard({ property }: { property?: Property }) {
           <span className="text-sm font-medium text-[#3EA76F]">
             {property.tipo_imovel}
           </span>
-          <span className="text-sm text-gray-500">
-            {property.endereco}
-          </span>
+          <span className="text-sm text-gray-500">{property.endereco}</span>
         </div>
         <h3 className="text-lg font-semibold mb-2">{property.cidade}</h3>
         <div className="flex items-center justify-between mb-4">
@@ -113,14 +109,10 @@ export default function PropertyCard({ property }: { property?: Property }) {
             <span className="text-2xl font-bold text-[#3EA76F]">
               R$ {property.valor_agio.toLocaleString()}
             </span>
-            <span className="text-sm text-gray-500 block">
-              Valor do ágio
-            </span>
+            <span className="text-sm text-gray-500 block">Valor do ágio</span>
           </div>
           <div className="text-right">
-            <span className="text-sm text-gray-500 block">
-              Parcela atual
-            </span>
+            <span className="text-sm text-gray-500 block">Parcela atual</span>
             <span className="font-semibold">
               R$ {property.valor_parcela_atual.toLocaleString()}/mês
             </span>
@@ -131,7 +123,10 @@ export default function PropertyCard({ property }: { property?: Property }) {
           <span>{property.banheiros} banheiros</span>
           <span>{property.area} m²</span>
         </div>
-        <Link href={`/exibir-imoveis/${property.id}`}>
+        {/* <Link href={`/exibir-imoveis/${property.id}`}>
+          <Button className="w-full">Ver Detalhes</Button>
+        </Link> */}
+        <Link href={`/detalhes-imoveis`}>
           <Button className="w-full">Ver Detalhes</Button>
         </Link>
       </div>
