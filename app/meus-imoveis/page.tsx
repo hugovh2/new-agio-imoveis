@@ -379,7 +379,7 @@ function EditPropertyModal({
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(
-        `http://127.0.0.1:8000/api/imoveis/${property.id}`,
+        `https://agio-imoveis.onrender.com/api/imoveis/${property.id}`,
         {
           method: 'POST',
           headers: {
@@ -731,7 +731,7 @@ export default function MeusImoveisPage() {
     if (!window.confirm('Tem certeza que deseja excluir este imóvel?')) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://127.0.0.1:8000/api/imoveis/${id}`, {
+      const res = await fetch(`https://agio-imoveis.onrender.com/api/imoveis/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
