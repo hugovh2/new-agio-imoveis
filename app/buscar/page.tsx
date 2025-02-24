@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/property-card";
@@ -26,13 +27,18 @@ interface Property {
 }
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const filterLocation = searchParams.get("location") || "";
+  const filterPropertyType = searchParams.get("propertyType") || "";
+  const filterPriceRange = searchParams.get("priceRange") || "";
+
   const [properties, setProperties] = useState<Property[]>([]);
   const [priceRange, setPriceRange] = useState([0, 500000]);
   const [areaRange, setAreaRange] = useState([0, 1000]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
-    location: "",
-    type: "all",
+    location: filterLocation,
+    type: filterPropertyType || "all",
     bedrooms: "any",
     bathrooms: "any",
     sortBy: "recent",
@@ -65,9 +71,10 @@ export default function SearchPage() {
   }, []);
 
   const filteredProperties = properties.filter((property) => {
-    const matchesLocation = property.endereco
-      .toLowerCase()
-      .includes(filters.location.toLowerCase());
+    const search = filters.location.toLowerCase();
+    const matchesLocation =
+      property.endereco.toLowerCase().includes(search) ||
+      property.cidade.toLowerCase().includes(search);
     const matchesType =
       filters.type === "all" ||
       property.tipo_imovel.toLowerCase() === filters.type;
@@ -187,7 +194,7 @@ export default function SearchPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Conteúdo dos filtros (omissão para brevidade) */}
+            {/* Conteúdo dos filtros */}
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold mb-4 flex items-center">

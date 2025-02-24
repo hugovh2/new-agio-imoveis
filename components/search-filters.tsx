@@ -1,15 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { Search } from "lucide-react";
 
 export default function SearchFilters() {
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [priceRange, setPriceRange] = useState("");
+
+  const router = useRouter();
+
+  const handleSearch = () => {
+    const queryParams = new URLSearchParams();
+    if (location) queryParams.append("location", location);
+    if (propertyType) queryParams.append("propertyType", propertyType);
+    if (priceRange) queryParams.append("priceRange", priceRange);
+
+    router.push(`/buscar?${queryParams.toString()}`);
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
@@ -41,7 +52,10 @@ export default function SearchFilters() {
           <option value="200000-300000">R$ 200.000 - R$ 300.000</option>
           <option value="300000+">Acima de R$ 300.000</option>
         </select>
-        <Button className="w-full bg-[#48C78E] hover:bg-[#3EA76F]">
+        <Button
+          className="w-full bg-[#48C78E] hover:bg-[#3EA76F]"
+          onClick={handleSearch}
+        >
           <Search className="w-4 h-4 mr-2" />
           Buscar
         </Button>
