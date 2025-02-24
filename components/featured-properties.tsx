@@ -26,7 +26,7 @@ export default function FeaturedProperties() {
   useEffect(() => {
     async function fetchProperties() {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/imoveis");
+        const res = await fetch("https://agio-imoveis.onrender.com/api/imoveis");
         if (res.ok) {
           const data = await res.json();
           // Normaliza os dados para garantir que o campo 'fotos' seja um array

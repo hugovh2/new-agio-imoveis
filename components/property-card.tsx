@@ -52,7 +52,7 @@ export default function PropertyCard({ property }: { property?: Property }) {
       <div className="relative">
         {photos.length > 0 ? (
           <Image
-            src={`http://127.0.0.1:8000/storage/${photos[currentImageIndex]}`}
+            src={`https://agio-imoveis.onrender.com/storage/${photos[currentImageIndex]}`}
             alt={property.tipo_imovel}
             width={400}
             height={300}

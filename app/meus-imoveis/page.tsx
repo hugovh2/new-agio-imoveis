@@ -81,7 +81,7 @@ function ImageGallery({
       <img
         src={
           fotos && fotos[currentImageIndex]
-            ? `http://127.0.0.1:8000/storage/${fotos[currentImageIndex]}`
+            ? `https://agio-imoveis.onrender.com/storage/${fotos[currentImageIndex]}`
             : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1073&q=80'
         }
         alt={descricao || 'Imagem do imóvel'}
@@ -336,7 +336,7 @@ function EditPropertyModal({
           {currentImages.map((foto, index) => (
             <div key={index} className="relative w-20 h-20">
               <img
-                src={`http://127.0.0.1:8000/storage/${foto}`}
+                src={`https://agio-imoveis.onrender.com/storage/${foto}`}
                 alt={`Imagem ${index + 1}`}
                 className="w-full h-full object-cover rounded border"
               />
@@ -660,7 +660,7 @@ export default function MeusImoveisPage() {
   const fetchProperties = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://127.0.0.1:8000/api/meus-imoveis', {
+      const res = await fetch('https://agio-imoveis.onrender.com/api/meus-imoveis', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

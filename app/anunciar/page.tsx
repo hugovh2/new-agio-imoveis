@@ -127,7 +127,7 @@ export default function AnunciarPage() {
       data.append("parcelas_restantes", formData.parcelas_restantes);
       data.append("valor_total_financiado", formData.valor_total_financiado);
 
-      const response = await fetch("http://127.0.0.1:8000/api/imoveis", {
+      const response = await fetch("https://agio-imoveis.onrender.com/api/imoveis", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
