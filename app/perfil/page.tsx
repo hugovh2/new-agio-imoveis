@@ -1,25 +1,43 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Settings, Bell, MessageSquare, ChevronRight, Edit2, MapPin, Mail, Phone, Calendar, Briefcase } from 'lucide-react';
+import { 
+  Menu, Bell, MessageSquare, ChevronRight, Edit2, Mail, Phone, Calendar 
+} from 'lucide-react';
 import { useAuth } from "@/context/AuthContext";
 import { randomAvatar } from '@/lib/utils';
 
+// Exemplo de definição de interface para o usuário, atualize conforme sua aplicação
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  telefone?: string;
+  avatar?: string; // Propriedade adicionada
+  role: string;
+  created_at: string;
+}
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user } = useAuth(); 
+  // Realize o cast para garantir que o 'user' siga a interface atualizada
+  const { user } = useAuth() as { user: User | null };
 
   useEffect(() => {
+    // Pode adicionar lógica se necessário
   }, [user]);
 
   if (!user) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-center text-red-500 text-lg">Você precisa estar logado para acessar esta página.</p>
+        <p className="text-center text-red-500 text-lg">
+          Você precisa estar logado para acessar esta página.
+        </p>
       </div>
     );
   }
 
+  // Agora o TypeScript reconhece a propriedade avatar
   const avatar = user.avatar ? user.avatar : randomAvatar();
 
   return (
@@ -108,7 +126,9 @@ function App() {
                   </div>
                   <div className="flex items-center space-x-3">
                     <Calendar className="h-5 w-5 text-[#3EA76F]" />
-                    <span className="text-gray-600">Membro desde {new Date(user.created_at).toLocaleDateString('pt-BR')}</span>
+                    <span className="text-gray-600">
+                      Membro desde {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                    </span>
                   </div>
                 </div>
               </div>
