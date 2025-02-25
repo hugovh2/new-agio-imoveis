@@ -119,9 +119,12 @@ export default function AnunciarPage() {
       data.append("complemento", formData.complemento);
       data.append("estado", formData.estado);
       data.append("cidade", formData.cidade);
+      
+      // Corrigindo o envio dos arquivos:
       formData.fotos.forEach((file) => {
         data.append("fotos[]", file);
       });
+
       data.append("valor_agio", formData.valor_agio);
       data.append("valor_parcela_atual", formData.valor_parcela_atual);
       data.append("parcelas_restantes", formData.parcelas_restantes);
@@ -148,6 +151,7 @@ export default function AnunciarPage() {
       toast.error("Ocorreu um erro ao enviar o anúncio. Tente novamente.");
     }
   };
+
 
   return (
     <div className="min-h-screen pt-20">
