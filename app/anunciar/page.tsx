@@ -155,7 +155,6 @@ export default function AnunciarPage() {
 
   return (
     <div className="min-h-screen pt-20">
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#3EA76F] to-[#48C78E] py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
