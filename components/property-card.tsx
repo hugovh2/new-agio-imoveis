@@ -31,6 +31,9 @@ export default function PropertyCard({ property }: { property?: Property }) {
   const photos = property.fotos || [];
   const [isFavorite, setIsFavorite] = useState(false);
 
+  // Debug: verifique se as fotos estão corretas
+  console.log("Fotos recebidas:", photos);
+
   const nextImage = () => {
     if (photos.length > 0) {
       setCurrentImageIndex((prev) =>
@@ -52,7 +55,7 @@ export default function PropertyCard({ property }: { property?: Property }) {
       <div className="relative">
         {photos.length > 0 ? (
           <Image
-            src={`https://agio-imoveis.onrender.com/storage/${photos[currentImageIndex]}`}
+            src={photos[currentImageIndex]} // Usa a URL completa do Cloudinary
             alt={property.tipo_imovel}
             width={400}
             height={300}
@@ -123,9 +126,6 @@ export default function PropertyCard({ property }: { property?: Property }) {
           <span>{property.banheiros} banheiros</span>
           <span>{property.area} m²</span>
         </div>
-        {/* <Link href={`/exibir-imoveis/${property.id}`}>
-          <Button className="w-full">Ver Detalhes</Button>
-        </Link> */}
         <Link href={`/detalhes-imoveis`}>
           <Button className="w-full">Ver Detalhes</Button>
         </Link>

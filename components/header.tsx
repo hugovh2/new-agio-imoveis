@@ -12,10 +12,9 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
-  // URL base para imagens salvas
-  const storageBaseUrl = "https://agio-imoveis.onrender.com/storage/";
-  // Se o usuário possuir foto cadastrada, exibe a foto completa, senão, usa um avatar aleatório
-  const avatar = user?.avatar ? storageBaseUrl + user.avatar : randomAvatar();
+
+  // Se o usuário possuir foto cadastrada, usa a URL completa retornada; caso contrário, usa um avatar aleatório
+  const avatar = user?.avatar ? user.avatar : randomAvatar();
 
   return (
     <header className="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b">
@@ -27,32 +26,20 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/buscar"
-              className="text-gray-600 hover:text-[#3EA76F]"
-            >
+            <Link href="/buscar" className="text-gray-600 hover:text-[#3EA76F]">
               Buscar Imóveis
             </Link>
-            <Link
-              href="/anunciar"
-              className="text-gray-600 hover:text-[#3EA76F]"
-            >
+            <Link href="/anunciar" className="text-gray-600 hover:text-[#3EA76F]">
               Anunciar
             </Link>
             <Link href="/sobre" className="text-gray-600 hover:text-[#3EA76F]">
               Sobre
             </Link>
-            <Link
-              href="/contato"
-              className="text-gray-600 hover:text-[#3EA76F]"
-            >
+            <Link href="/contato" className="text-gray-600 hover:text-[#3EA76F]">
               Contato
             </Link>
             {user && (
-              <Link
-                href="/meus-imoveis"
-                className="text-gray-600 hover:text-[#3EA76F]"
-              >
+              <Link href="/meus-imoveis" className="text-gray-600 hover:text-[#3EA76F]">
                 Meus Imóveis
               </Link>
             )}
@@ -77,10 +64,7 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <Button
-                  variant="ghost"
-                  onClick={() => router.push("/auth/login")}
-                >
+                <Button variant="ghost" onClick={() => router.push("/auth/login")}>
                   Entrar
                 </Button>
                 <Button onClick={() => router.push("/auth/register")}>
@@ -91,10 +75,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
+          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -104,35 +85,20 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden">
           <nav className="px-4 pt-2 pb-4 space-y-2">
-            <Link
-              href="/buscar"
-              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
-            >
+            <Link href="/buscar" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
               Buscar Imóveis
             </Link>
-            <Link
-              href="/anunciar"
-              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
-            >
+            <Link href="/anunciar" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
               Anunciar
             </Link>
-            <Link
-              href="/sobre"
-              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
-            >
+            <Link href="/sobre" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
               Sobre
             </Link>
-            <Link
-              href="/contato"
-              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
-            >
+            <Link href="/contato" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
               Contato
             </Link>
             {user && (
-              <Link
-                href="/meus-imoveis"
-                className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
-              >
+              <Link href="/meus-imoveis" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
                 Meus Imóveis
               </Link>
             )}
@@ -149,27 +115,16 @@ export default function Header() {
                       Olá, {user.name}
                     </span>
                   </Link>
-                  <Button
-                    variant="ghost"
-                    className="w-full"
-                    onClick={logout}
-                  >
+                  <Button variant="ghost" className="w-full" onClick={logout}>
                     Logout
                   </Button>
                 </div>
               ) : (
                 <>
-                  <Button
-                    variant="ghost"
-                    className="w-full"
-                    onClick={() => router.push("/auth/login")}
-                  >
+                  <Button variant="ghost" className="w-full" onClick={() => router.push("/auth/login")}>
                     Entrar
                   </Button>
-                  <Button
-                    className="w-full"
-                    onClick={() => router.push("/auth/register")}
-                  >
+                  <Button className="w-full" onClick={() => router.push("/auth/register")}>
                     Cadastrar
                   </Button>
                 </>
