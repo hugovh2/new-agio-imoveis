@@ -239,7 +239,6 @@ function App() {
         </div>
       )}
 
-
       {/* Header – permanece fixo no topo */}
       <header className="bg-white border-b border-gray-200 fixed w-full z-50 shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -269,7 +268,11 @@ function App() {
             >
               <MessageSquare className="h-6 w-6 text-gray-600" />
             </button>
-            <div className="h-8 w-8 rounded-full overflow-hidden">
+            {/* Avatar pequena no header com onClick para atualizar foto */}
+            <div
+              className="h-8 w-8 rounded-full overflow-hidden cursor-pointer"
+              onClick={handlePhotoClick}
+            >
               <img
                 src={avatar}
                 alt={user.name}
@@ -366,11 +369,13 @@ function App() {
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center mb-4 md:mb-0">
-                  <div className="relative mr-4 hidden md:block">
+                  {/* Foto de perfil grande sempre exibida */}
+                  <div className="relative mr-4">
                     <img
                       src={avatar}
                       alt={user.name}
-                      className="w-20 h-20 rounded-full object-cover border-4 border-[#A7EBC1]"
+                      className="w-20 h-20 rounded-full object-cover border-4 border-[#A7EBC1] cursor-pointer"
+                      onClick={handlePhotoClick}
                     />
                     {/* Botão para editar a foto, posicionado sobre a imagem */}
                     <button
