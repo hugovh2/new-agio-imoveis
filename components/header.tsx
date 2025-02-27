@@ -7,6 +7,10 @@ import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
+// Defina um avatar padrão, caso o usuário não tenha um
+const defaultAvatar =
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80";
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
@@ -22,20 +26,32 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/buscar" className="text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/buscar"
+              className="text-gray-600 hover:text-[#3EA76F]"
+            >
               Buscar Imóveis
             </Link>
-            <Link href="/anunciar" className="text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/anunciar"
+              className="text-gray-600 hover:text-[#3EA76F]"
+            >
               Anunciar
             </Link>
             <Link href="/sobre" className="text-gray-600 hover:text-[#3EA76F]">
               Sobre
             </Link>
-            <Link href="/contato" className="text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/contato"
+              className="text-gray-600 hover:text-[#3EA76F]"
+            >
               Contato
             </Link>
             {user && (
-              <Link href="/meus-imoveis" className="text-gray-600 hover:text-[#3EA76F]">
+              <Link
+                href="/meus-imoveis"
+                className="text-gray-600 hover:text-[#3EA76F]"
+              >
                 Meus Imóveis
               </Link>
             )}
@@ -43,23 +59,30 @@ export default function Header() {
 
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
-              <>
-                <Link href="/perfil">
-                  <span className="text-gray-600 cursor-pointer">Olá, {user.name}</span>
+              <div className="flex items-center space-x-2">
+                <Link href="/perfil" className="flex items-center space-x-2">
+                  <img
+                    src={user.avatar || defaultAvatar}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <span className="text-gray-600 cursor-pointer">
+                    Olá, {user.name}
+                  </span>
                 </Link>
                 <Button variant="ghost" onClick={logout}>
                   Logout
                 </Button>
-              </>
+              </div>
             ) : (
               <>
-                <Button 
+                <Button
                   variant="ghost"
-                  onClick={() => router.push('/auth/login')}
+                  onClick={() => router.push("/auth/login")}
                 >
                   Entrar
                 </Button>
-                <Button onClick={() => router.push('/auth/register')}>
+                <Button onClick={() => router.push("/auth/register")}>
                   Cadastrar
                 </Button>
               </>
@@ -114,30 +137,37 @@ export default function Header() {
             )}
             <div className="pt-2 space-y-2">
               {user ? (
-                <>
-                  <Link href="/perfil/profile">
-                    <span className="block text-gray-600 cursor-pointer">Olá, {user.name}</span>
+                <div className="flex flex-col space-y-2">
+                  <Link href="/perfil/profile" className="flex items-center space-x-2">
+                    <img
+                      src={user.avatar || defaultAvatar}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <span className="text-gray-600 cursor-pointer">
+                      Olá, {user.name}
+                    </span>
                   </Link>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="w-full"
                     onClick={logout}
                   >
                     Logout
                   </Button>
-                </>
+                </div>
               ) : (
                 <>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="w-full"
-                    onClick={() => router.push('/auth/login')}
+                    onClick={() => router.push("/auth/login")}
                   >
                     Entrar
                   </Button>
-                  <Button 
+                  <Button
                     className="w-full"
-                    onClick={() => router.push('/auth/register')}
+                    onClick={() => router.push("/auth/register")}
                   >
                     Cadastrar
                   </Button>
