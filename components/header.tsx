@@ -8,15 +8,14 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { randomAvatar } from '@/lib/utils';
 
-// Defina um avatar padrão, caso o usuário não tenha um
-
-
-
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
-  const avatar = user?.avatar ? user.avatar : randomAvatar();
+  // URL base para imagens salvas
+  const storageBaseUrl = "https://agio-imoveis.onrender.com/storage/";
+  // Se o usuário possuir foto cadastrada, exibe a foto completa, senão, usa um avatar aleatório
+  const avatar = user?.avatar ? storageBaseUrl + user.avatar : randomAvatar();
 
   return (
     <header className="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b">
@@ -64,7 +63,7 @@ export default function Header() {
               <div className="flex items-center space-x-2">
                 <Link href="/perfil" className="flex items-center space-x-2">
                   <img
-                    src={user.avatar || avatar}
+                    src={avatar}
                     alt={user.name}
                     className="w-8 h-8 rounded-full object-cover"
                   />
@@ -142,7 +141,7 @@ export default function Header() {
                 <div className="flex flex-col space-y-2">
                   <Link href="/perfil/profile" className="flex items-center space-x-2">
                     <img
-                      src={user.avatar || defaultAvatar}
+                      src={avatar}
                       alt={user.name}
                       className="w-8 h-8 rounded-full object-cover"
                     />

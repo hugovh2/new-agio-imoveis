@@ -19,9 +19,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
-import { randomAvatar } from '@/lib/utils';
-
-// Função para gerar um avatar aleatório caso o usuário não possua
+import { randomAvatar } from "@/lib/utils";
+import Link from "next/link";
 
 interface UserType {
   id: number;
@@ -42,17 +41,26 @@ function App() {
   const [editedUser, setEditedUser] = useState<UserType | null>(initialUser);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState("info");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // URL base para imagens salvas (ajuste conforme necessário)
-  const storageBaseUrl = "http://127.0.0.1:8000/storage/";
+  const storageBaseUrl = "https://agio-imoveis.onrender.com/storage/";
 
+  // Ao montar o componente, verifica se há dados atualizados no localStorage
   useEffect(() => {
     if (initialUser) {
       setUser(initialUser);
       setEditedUser(initialUser);
+    } else {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setEditedUser(parsedUser);
+      }
     }
   }, [initialUser]);
 
@@ -79,9 +87,10 @@ function App() {
     );
   }
 
-  // Constrói a URL completa do avatar, se existir
-  const avatar = user?.avatar ? user.avatar : randomAvatar();
-  // Função para salvar as alterações (incluindo a foto) no back end
+  // Se houver foto cadastrada, constrói a URL completa; caso contrário, usa avatar aleatório
+  const avatar = user?.avatar ? storageBaseUrl + user.avatar : randomAvatar();
+
+  // Função para salvar todas as alterações (incluindo a foto) no back end
   const handleSaveProfile = async () => {
     try {
       const formData = new FormData();
@@ -93,14 +102,54 @@ function App() {
       formData.append("location", editedUser?.location || "");
       formData.append("bio", editedUser?.bio || "");
 
-      // Se houver um novo avatar selecionado, adiciona-o ao FormData
-      if (fileInputRef.current?.files?.[0]) {
-        formData.append("avatar", fileInputRef.current.files[0]);
+      if (avatarFile) {
+        formData.append("avatar", avatarFile);
       }
 
       const token = localStorage.getItem("token");
-      const response = await fetch("http://127.0.0.1:8000/api/user/update", {
-        method: "POST", // Usando POST com _method=PUT
+      const response = await fetch("https://agio-imoveis.onrender.com/api/user/update", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        // Atualiza o estado e persiste os dados atualizados
+        setUser(data.user);
+        setEditedUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast.success("Perfil atualizado com sucesso!");
+        setAvatarFile(null);
+      } else {
+        toast.error("Erro ao atualizar perfil: " + data.message);
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      toast.error("Erro ao atualizar perfil.");
+    }
+  };
+
+  // Função exclusiva para atualizar a foto de perfil
+  const handleSavePhotoUpdate = async () => {
+    if (!avatarFile) return;
+    try {
+      const formData = new FormData();
+      formData.append("_method", "PUT");
+      formData.append("name", editedUser?.name || "");
+      formData.append("email", editedUser?.email || "");
+      formData.append("telefone", editedUser?.telefone || "");
+      formData.append("role", editedUser?.role || "");
+      formData.append("location", editedUser?.location || "");
+      formData.append("bio", editedUser?.bio || "");
+      formData.append("avatar", avatarFile);
+
+      const token = localStorage.getItem("token");
+      const response = await fetch("https://agio-imoveis.onrender.com/api/user/update", {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
@@ -112,19 +161,22 @@ function App() {
       if (data.success) {
         setUser(data.user);
         setEditedUser(data.user);
-        toast.success("Perfil atualizado com sucesso!");
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast.success("Foto atualizada com sucesso!");
       } else {
-        toast.error("Erro ao atualizar perfil: " + data.message);
+        toast.error("Erro ao atualizar foto: " + data.message);
       }
     } catch (error) {
-      console.error("Erro na requisição:", error);
-      toast.error("Erro ao atualizar perfil.");
+      console.error("Erro na atualização da foto:", error);
+      toast.error("Erro ao atualizar foto.");
     }
+    setShowImageUpload(false);
+    setPreviewImage(null);
+    setAvatarFile(null);
   };
 
   const handleEditToggle = async () => {
     if (isEditing) {
-      // Ao salvar, chama a função para atualizar o perfil
       await handleSaveProfile();
       setIsEditing(false);
     } else {
@@ -146,6 +198,7 @@ function App() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
@@ -154,19 +207,13 @@ function App() {
     }
   };
 
-  const handleUploadConfirm = () => {
-    if (previewImage && editedUser) {
-      // Atualiza o estado local com o preview da imagem (isso será substituído
-      // pelo caminho real retornado pelo back end após a atualização)
-      setEditedUser({ ...editedUser, avatar: previewImage });
-      setShowImageUpload(false);
-      setPreviewImage(null);
-    }
-  };
-
   const handleUploadCancel = () => {
     setShowImageUpload(false);
     setPreviewImage(null);
+    setAvatarFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const triggerFileInput = () => {
@@ -186,7 +233,9 @@ function App() {
             >
               <Menu className="h-6 w-6 text-gray-600" />
             </button>
-            <h1 className="text-xl font-semibold text-[#3EA76F]">Perfil</h1>
+            <Link href="/" className="text-2xl font-bold text-[#3EA76F]">
+              Ágio Imóveis
+            </Link>
           </div>
           <div className="flex items-center space-x-4">
             <button
@@ -203,11 +252,11 @@ function App() {
               <MessageSquare className="h-6 w-6 text-gray-600" />
             </button>
             <div className="h-8 w-8 rounded-full overflow-hidden">
-               <img 
-                  src={avatar} 
-                  alt={user.name}
-                  className="h-full w-full object-cover"
-                />
+              <img
+                src={avatar}
+                alt={user.name}
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
         </div>
@@ -232,16 +281,14 @@ function App() {
                   className="w-24 h-24 rounded-full object-cover border-4 border-[#A7EBC1]"
                 />
                 <button
-                  className="absolute bottom-0 right-0 p-2 bg-[#3EA76F] rounded-full text-white hover:bg-[#48C78E] transition-colors"
                   onClick={handlePhotoClick}
-                  aria-label="Edit profile picture"
+                  className="absolute bottom-0 right-0 p-2 bg-[#3EA76F] rounded-full text-white hover:bg-[#48C78E] transition-colors"
+                  aria-label="Editar foto de perfil"
                 >
                   <Edit2 className="h-4 w-4" />
                 </button>
               </div>
-              <h2 className="mt-4 text-xl font-semibold">
-                {editedUser?.name}
-              </h2>
+              <h2 className="mt-4 text-xl font-semibold">{editedUser?.name}</h2>
               <p className="text-gray-600">{editedUser?.role}</p>
               <p className="text-sm text-gray-500 flex items-center mt-1">
                 <MapPin className="h-3 w-3 mr-1" />
@@ -262,7 +309,9 @@ function App() {
                   },
                   {
                     name: "Mensagens",
-                    icon: <MessageSquare className="h-5 w-5 mr-3 text-[#3EA76F]" />,
+                    icon: (
+                      <MessageSquare className="h-5 w-5 mr-3 text-[#3EA76F]" />
+                    ),
                   },
                   {
                     name: "Calendário",
@@ -305,6 +354,14 @@ function App() {
                       alt={user.name}
                       className="w-20 h-20 rounded-full object-cover border-4 border-[#A7EBC1]"
                     />
+                    {/* Botão para editar a foto, posicionado sobre a imagem */}
+                    <button
+                      onClick={handlePhotoClick}
+                      className="absolute bottom-0 right-0 p-1 bg-[#3EA76F] rounded-full text-white hover:bg-[#48C78E]"
+                      aria-label="Editar foto de perfil"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-800">
@@ -501,9 +558,7 @@ function App() {
                           </div>
                         </div>
                         <div className="bg-gray-50 p-4 rounded-lg">
-                          <p className="text-sm text-gray-500 mb-1">
-                            Telefone
-                          </p>
+                          <p className="text-sm text-gray-500 mb-1">Telefone</p>
                           <div className="flex items-center">
                             <Phone className="h-4 w-4 text-[#3EA76F] mr-2" />
                             <p className="text-gray-800">
@@ -689,12 +744,8 @@ function App() {
                       >
                         <div className="mr-4">{icon}</div>
                         <div>
-                          <p className="font-medium text-gray-800">
-                            {label}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {description}
-                          </p>
+                          <p className="font-medium text-gray-800">{label}</p>
+                          <p className="text-sm text-gray-600">{description}</p>
                         </div>
                       </a>
                     ))}
@@ -735,9 +786,7 @@ function App() {
                   className="w-32 h-32 mx-auto bg-gray-100 rounded-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
                 >
                   <Camera className="h-8 w-8 text-gray-500 mb-2" />
-                  <p className="text-sm text-gray-500">
-                    Clique para selecionar
-                  </p>
+                  <p className="text-sm text-gray-500">Clique para selecionar</p>
                 </div>
               )}
               <input
@@ -756,7 +805,7 @@ function App() {
                 Cancelar
               </button>
               <button
-                onClick={handleUploadConfirm}
+                onClick={handleSavePhotoUpdate}
                 disabled={!previewImage}
                 className={`px-4 py-2 rounded-lg text-white transition-colors ${
                   previewImage
