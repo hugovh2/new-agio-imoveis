@@ -18,11 +18,10 @@ import {
   Briefcase,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
+import { randomAvatar } from '@/lib/utils';
 
 // Função para gerar um avatar aleatório caso o usuário não possua
-const randomAvatar = () =>
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80";
 
 interface UserType {
   id: number;
@@ -46,6 +45,9 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState("info");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // URL base para imagens salvas (ajuste conforme necessário)
+  const storageBaseUrl = "http://127.0.0.1:8000/storage/";
 
   useEffect(() => {
     if (initialUser) {
@@ -77,53 +79,48 @@ function App() {
     );
   }
 
-  const avatar = user.avatar ? user.avatar : randomAvatar();
-
-  // Função para salvar as alterações no back end
+  // Constrói a URL completa do avatar, se existir
+  const avatar = user?.avatar ? user.avatar : randomAvatar();
+  // Função para salvar as alterações (incluindo a foto) no back end
   const handleSaveProfile = async () => {
     try {
-      // Cria um FormData e adiciona o _method para simular PUT
       const formData = new FormData();
-      formData.append('_method', 'PUT');
-      // Adiciona o id do usuário
-      formData.append('id', editedUser?.id.toString() || '');
-      formData.append('name', editedUser?.name || '');
-      formData.append('email', editedUser?.email || '');
-      formData.append('telefone', editedUser?.telefone || '');
-      formData.append('role', editedUser?.role || '');
-      formData.append('location', editedUser?.location || '');
-      formData.append('bio', editedUser?.bio || '');
-  
-      // Se houver um novo avatar selecionado, adiciona-o ao formData
+      formData.append("_method", "PUT");
+      formData.append("name", editedUser?.name || "");
+      formData.append("email", editedUser?.email || "");
+      formData.append("telefone", editedUser?.telefone || "");
+      formData.append("role", editedUser?.role || "");
+      formData.append("location", editedUser?.location || "");
+      formData.append("bio", editedUser?.bio || "");
+
+      // Se houver um novo avatar selecionado, adiciona-o ao FormData
       if (fileInputRef.current?.files?.[0]) {
-        formData.append('avatar', fileInputRef.current.files[0]);
+        formData.append("avatar", fileInputRef.current.files[0]);
       }
-  
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://agio-imoveis.onrender.com/api/user/update', {
-        method: 'POST', // Usando POST com _method=PUT
+
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://127.0.0.1:8000/api/user/update", {
+        method: "POST", // Usando POST com _method=PUT
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
+          Accept: "application/json",
         },
         body: formData,
       });
-  
+
       const data = await response.json();
       if (data.success) {
         setUser(data.user);
-        toast.success('Perfil atualizado com sucesso!');
-        // Atualize o contexto de autenticação se necessário
+        setEditedUser(data.user);
+        toast.success("Perfil atualizado com sucesso!");
       } else {
-        toast.error('Erro ao atualizar perfil: ' + data.message);
+        toast.error("Erro ao atualizar perfil: " + data.message);
       }
     } catch (error) {
-      console.error('Erro na requisição:', error);
-      toast.error('Erro ao atualizar perfil.');
+      console.error("Erro na requisição:", error);
+      toast.error("Erro ao atualizar perfil.");
     }
   };
-  
-  
 
   const handleEditToggle = async () => {
     if (isEditing) {
@@ -159,6 +156,8 @@ function App() {
 
   const handleUploadConfirm = () => {
     if (previewImage && editedUser) {
+      // Atualiza o estado local com o preview da imagem (isso será substituído
+      // pelo caminho real retornado pelo back end após a atualização)
       setEditedUser({ ...editedUser, avatar: previewImage });
       setShowImageUpload(false);
       setPreviewImage(null);
@@ -180,7 +179,6 @@ function App() {
       <header className="bg-white border-b border-gray-200 fixed w-full z-50 shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            {/* Botão para abrir/fechar o sidebar no mobile */}
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors md:hidden"
@@ -205,11 +203,16 @@ function App() {
               <MessageSquare className="h-6 w-6 text-gray-600" />
             </button>
             <div className="h-8 w-8 rounded-full overflow-hidden">
-              <img
-                src={editedUser?.avatar || avatar}
+              {/* <img
+                src={avatar}
                 alt={user.name}
                 className="h-full w-full object-cover"
-              />
+              /> */}
+               <img 
+                  src={avatar} 
+                  alt={user.name}
+                  className="h-full w-full object-cover"
+                />
             </div>
           </div>
         </div>
@@ -229,7 +232,7 @@ function App() {
             <div className="flex flex-col items-center">
               <div className="relative">
                 <img
-                  src={editedUser?.avatar || avatar}
+                  src={avatar}
                   alt={user.name}
                   className="w-24 h-24 rounded-full object-cover border-4 border-[#A7EBC1]"
                 />
@@ -303,7 +306,7 @@ function App() {
                 <div className="flex items-center mb-4 md:mb-0">
                   <div className="relative mr-4 hidden md:block">
                     <img
-                      src={editedUser?.avatar || avatar}
+                      src={avatar}
                       alt={user.name}
                       className="w-20 h-20 rounded-full object-cover border-4 border-[#A7EBC1]"
                     />
@@ -691,8 +694,12 @@ function App() {
                       >
                         <div className="mr-4">{icon}</div>
                         <div>
-                          <p className="font-medium text-gray-800">{label}</p>
-                          <p className="text-sm text-gray-600">{description}</p>
+                          <p className="font-medium text-gray-800">
+                            {label}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {description}
+                          </p>
                         </div>
                       </a>
                     ))}
@@ -768,6 +775,7 @@ function App() {
           </div>
         </div>
       )}
+      <ToastContainer />
     </div>
   );
 }
