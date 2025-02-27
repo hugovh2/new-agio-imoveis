@@ -331,7 +331,7 @@ function EditPropertyModal({
           {currentImages.map((foto, index) => (
             <div key={index} className="relative w-20 h-20">
               <img
-                src={`https://agio-imoveis.onrender.com/storage/${foto}`}
+                src={foto} // Usa a URL completa diretamente
                 alt={`Imagem ${index + 1}`}
                 className="w-full h-full object-cover rounded border"
               />
@@ -351,6 +351,7 @@ function EditPropertyModal({
     }
     return <p className="text-sm text-gray-500">Nenhuma imagem cadastrada.</p>;
   };
+  
 
   const onSubmit = async (data: EditFormData) => {
     const formData = new FormData();
