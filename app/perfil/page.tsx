@@ -16,11 +16,13 @@ import {
   User,
   MapPin,
   Briefcase,
+  Loader2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import { randomAvatar } from "@/lib/utils";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface UserType {
   id: number;
@@ -45,6 +47,7 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState("info");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // URL base para imagens salvas (ajuste conforme necessário)
   const storageBaseUrl = "https://agio-imoveis.onrender.com/storage/";
@@ -78,9 +81,11 @@ function App() {
             <p className="text-center text-gray-600 mb-6">
               Você precisa estar logado para acessar esta página.
             </p>
-            <button className="w-full py-3 bg-[#3EA76F] text-white rounded-lg hover:bg-[#48C78E] transition-colors">
-              Fazer Login
-            </button>
+            <Link href={`/auth/login`}>
+              <Button size="lg" variant="default">
+                Fazer Login
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -92,6 +97,7 @@ function App() {
 
   // Função para salvar todas as alterações (incluindo a foto) no back end
   const handleSaveProfile = async () => {
+    setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append("_method", "PUT");
@@ -118,7 +124,6 @@ function App() {
 
       const data = await response.json();
       if (data.success) {
-        // Atualiza o estado e persiste os dados atualizados
         setUser(data.user);
         setEditedUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
@@ -130,12 +135,15 @@ function App() {
     } catch (error) {
       console.error("Erro na requisição:", error);
       toast.error("Erro ao atualizar perfil.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Função exclusiva para atualizar a foto de perfil
   const handleSavePhotoUpdate = async () => {
     if (!avatarFile) return;
+    setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append("_method", "PUT");
@@ -169,10 +177,12 @@ function App() {
     } catch (error) {
       console.error("Erro na atualização da foto:", error);
       toast.error("Erro ao atualizar foto.");
+    } finally {
+      setIsLoading(false);
+      setShowImageUpload(false);
+      setPreviewImage(null);
+      setAvatarFile(null);
     }
-    setShowImageUpload(false);
-    setPreviewImage(null);
-    setAvatarFile(null);
   };
 
   const handleEditToggle = async () => {
@@ -222,6 +232,14 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
+          <Loader2 className="h-12 w-12 text-white animate-spin" />
+        </div>
+      )}
+
+
       {/* Header – permanece fixo no topo */}
       <header className="bg-white border-b border-gray-200 fixed w-full z-50 shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
