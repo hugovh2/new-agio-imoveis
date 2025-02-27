@@ -105,7 +105,7 @@ export default function Header() {
             <div className="pt-2 space-y-2">
               {user ? (
                 <div className="flex flex-col space-y-2">
-                  <Link href="/perfil/profile" className="flex items-center space-x-2">
+                  <Link href="/perfil" className="flex items-center space-x-2">
                     <img
                       src={avatar}
                       alt={user.name}
