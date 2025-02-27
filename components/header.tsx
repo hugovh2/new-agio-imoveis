@@ -6,15 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { randomAvatar } from '@/lib/utils';
 
 // Defina um avatar padrão, caso o usuário não tenha um
-const defaultAvatar =
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80";
+
+
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
+  const avatar = user?.avatar ? user.avatar : randomAvatar();
 
   return (
     <header className="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b">
@@ -62,7 +64,7 @@ export default function Header() {
               <div className="flex items-center space-x-2">
                 <Link href="/perfil" className="flex items-center space-x-2">
                   <img
-                    src={user.avatar || defaultAvatar}
+                    src={user.avatar || avatar}
                     alt={user.name}
                     className="w-8 h-8 rounded-full object-cover"
                   />

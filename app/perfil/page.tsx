@@ -203,11 +203,6 @@ function App() {
               <MessageSquare className="h-6 w-6 text-gray-600" />
             </button>
             <div className="h-8 w-8 rounded-full overflow-hidden">
-              {/* <img
-                src={avatar}
-                alt={user.name}
-                className="h-full w-full object-cover"
-              /> */}
                <img 
                   src={avatar} 
                   alt={user.name}
