@@ -49,10 +49,6 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // URL base para imagens salvas (ajuste conforme necessário)
-  const storageBaseUrl = "https://agio-imoveis.onrender.com/storage/";
-
-  // Ao montar o componente, verifica se há dados atualizados no localStorage
   useEffect(() => {
     if (initialUser) {
       setUser(initialUser);
@@ -92,10 +88,14 @@ function App() {
     );
   }
 
-  // Se houver foto cadastrada, constrói a URL completa; caso contrário, usa avatar aleatório
-  const avatar = user?.avatar ? storageBaseUrl + user.avatar : randomAvatar();
+  // Se o usuário possuir avatar, verifica se já é uma URL completa
+  const avatar = user?.avatar
+    ? user.avatar.startsWith("http")
+      ? user.avatar
+      : "https://agio-imoveis.onrender.com/storage/" + user.avatar
+    : randomAvatar();
 
-  // Função para salvar todas as alterações (incluindo a foto) no back end
+  // Função para salvar as alterações no perfil
   const handleSaveProfile = async () => {
     setIsLoading(true);
     try {
