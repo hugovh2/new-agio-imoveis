@@ -4,7 +4,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { unoptimized: true },
+  images: {
+    domains: ['res.cloudinary.com'], // Permite carregar imagens do Cloudinary
+    unoptimized: true,
+  },
 };
 
 module.exports = nextConfig;
