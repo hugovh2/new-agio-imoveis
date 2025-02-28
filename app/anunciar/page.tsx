@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Camera, DollarSign, Home, Upload, Loader2 } from "lucide-react";
+import { Camera, DollarSign, Home, Upload, Loader2, MapPin } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -36,7 +36,32 @@ export default function AnunciarPage() {
     valor_total_financiado: "",
   });
 
+  // Estado para exibir loading ao publicar o imóvel
+  const [isPublishing, setIsPublishing] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Função para formatar a string de valor em moeda (ex: R$ 1.234,56)
+  const formatCurrency = (value: string) => {
+    let cleaned = value.replace(/[^\d,]/g, "");
+    if (!cleaned) return "";
+    const numericValue = parseFloat(cleaned.replace(",", "."));
+    if (isNaN(numericValue)) return "";
+    return numericValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  };
+
+  // Função para converter o valor formatado para número com ponto decimal (ex: 1234.56)
+  const parseCurrency = (value: string) => {
+    return value.replace(/[R$\s.]/g, "").replace(",", ".");
+  };
+
+  // Função para remover foto selecionada
+  const removePhoto = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      fotos: prev.fotos.filter((_, i) => i !== index)
+    }));
+  };
 
   // Verifica se o usuário está logado
   useEffect(() => {
@@ -63,9 +88,7 @@ export default function AnunciarPage() {
 
   // Função para atualizar os campos do formulário
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -106,6 +129,7 @@ export default function AnunciarPage() {
 
   // Envia os dados para o backend via FormData
   const handleSubmit = async () => {
+    setIsPublishing(true);
     try {
       const token = localStorage.getItem("authToken");
       const data = new FormData();
@@ -120,15 +144,14 @@ export default function AnunciarPage() {
       data.append("estado", formData.estado);
       data.append("cidade", formData.cidade);
       
-      // Corrigindo o envio dos arquivos:
       formData.fotos.forEach((file) => {
         data.append("fotos[]", file);
       });
 
-      data.append("valor_agio", formData.valor_agio);
-      data.append("valor_parcela_atual", formData.valor_parcela_atual);
+      data.append("valor_agio", parseCurrency(formData.valor_agio));
+      data.append("valor_parcela_atual", parseCurrency(formData.valor_parcela_atual));
       data.append("parcelas_restantes", formData.parcelas_restantes);
-      data.append("valor_total_financiado", formData.valor_total_financiado);
+      data.append("valor_total_financiado", parseCurrency(formData.valor_total_financiado));
 
       const response = await fetch("https://agio-imoveis.onrender.com/api/imoveis", {
         method: "POST",
@@ -149,12 +172,13 @@ export default function AnunciarPage() {
     } catch (error) {
       console.error("Erro ao enviar anúncio:", error);
       toast.error("Ocorreu um erro ao enviar o anúncio. Tente novamente.");
+    } finally {
+      setIsPublishing(false);
     }
   };
 
-
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 relative">
       <section className="bg-gradient-to-r from-[#3EA76F] to-[#48C78E] py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -180,7 +204,7 @@ export default function AnunciarPage() {
               </div>
               <div className={`flex-1 text-center ${step >= 2 ? "text-[#3EA76F]" : "text-gray-400"}`}>
                 <div className={`w-8 h-8 rounded-full ${step >= 2 ? "bg-[#3EA76F]" : "bg-gray-200"} flex items-center justify-center mx-auto mb-2`}>
-                  <Home className="w-4 h-4 text-white" />
+                  <MapPin className="w-4 h-4 text-white" /> 
                 </div>
                 <span className="text-sm">Dados do Endereço</span>
               </div>
@@ -359,10 +383,7 @@ export default function AnunciarPage() {
                   <p className="text-gray-600 mb-2">
                     Arraste suas fotos aqui ou
                   </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
+                  <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
                     Selecionar Arquivos
                   </Button>
                   <p className="text-sm text-gray-500 mt-2">PNG, JPG até 5MB</p>
@@ -384,6 +405,12 @@ export default function AnunciarPage() {
                           alt={`Preview ${index}`}
                           className="w-full h-32 object-cover rounded"
                         />
+                        <button
+                          onClick={() => removePhoto(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                        >
+                          X
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -412,6 +439,10 @@ export default function AnunciarPage() {
                       placeholder="R$ 0,00"
                       value={formData.valor_agio}
                       onChange={handleInputChange}
+                      onBlur={(e) => {
+                        const formatted = formatCurrency(e.target.value);
+                        setFormData((prev) => ({ ...prev, valor_agio: formatted }));
+                      }}
                     />
                   </div>
                   <div>
@@ -424,6 +455,10 @@ export default function AnunciarPage() {
                       placeholder="R$ 0,00"
                       value={formData.valor_parcela_atual}
                       onChange={handleInputChange}
+                      onBlur={(e) => {
+                        const formatted = formatCurrency(e.target.value);
+                        setFormData((prev) => ({ ...prev, valor_parcela_atual: formatted }));
+                      }}
                     />
                   </div>
                   <div>
@@ -448,6 +483,10 @@ export default function AnunciarPage() {
                       placeholder="R$ 0,00"
                       value={formData.valor_total_financiado}
                       onChange={handleInputChange}
+                      onBlur={(e) => {
+                        const formatted = formatCurrency(e.target.value);
+                        setFormData((prev) => ({ ...prev, valor_total_financiado: formatted }));
+                      }}
                     />
                   </div>
                 </div>
@@ -455,14 +494,32 @@ export default function AnunciarPage() {
                   <Button variant="outline" onClick={() => setStep(3)}>
                     Voltar
                   </Button>
-                  <Button onClick={handleSubmit}>Publicar Anúncio</Button>
+                  <Button onClick={handleSubmit} disabled={isPublishing}>
+                    {isPublishing ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                        Publicar Anúncio
+                      </>
+                    ) : (
+                      "Publicar Anúncio"
+                    )}
+                  </Button>
                 </div>
               </div>
             )}
           </div>
         </div>
       </section>
+
       <ToastContainer />
+
+      {/* Overlay de Loading ao Publicar */}
+      {isPublishing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
+          <Loader2 className="animate-spin h-10 w-10 text-white" />
+          <p className="mt-4 text-white text-xl">Publicando...</p>
+        </div>
+      )}
     </div>
   );
 }
