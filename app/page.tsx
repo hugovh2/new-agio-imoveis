@@ -80,7 +80,7 @@ export default function Home() {
         <TestimonialsSection />
 
         {/* Últimas Propriedades */}
-        <UltimasPropriedades />
+        {/* <UltimasPropriedades /> */}
 
         {/* Seção de Localização */}
         <LocationSection />
