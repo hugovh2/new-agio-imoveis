@@ -65,7 +65,7 @@ export default function HeroCarousel() {
         <title>Agio Imóveis - Carousel</title>
         <meta
           name="description"
-          content="Descubra imóveis incríveis com o nosso Hero Carousel. Encontre o imóvel dos seus sonhos com as melhores oportunidades."
+          content="Descubra imóveis incríveis com o nosso Hero Carousel. Agio Imóveis."
         />
         <meta
           name="keywords"
@@ -77,7 +77,7 @@ export default function HeroCarousel() {
         <meta property="og:title" content="Agio Imóveis - Carousel" />
         <meta
           property="og:description"
-          content="Descubra imóveis incríveis com o nosso Hero Carousel. Encontre o imóvel dos seus sonhos com as melhores oportunidades."
+          content="Descubra imóveis incríveis com o nosso Hero Carousel. Agio Imóveis."
         />
         <meta property="og:url" content="https://www.agiomoveis.com.br" />
         <meta property="og:type" content="website" />
@@ -87,7 +87,7 @@ export default function HeroCarousel() {
         <meta name="twitter:title" content="Agio Imóveis - Carousel" />
         <meta
           name="twitter:description"
-          content="Descubra imóveis incríveis com o nosso Hero Carousel. Encontre o imóvel dos seus sonhos com as melhores oportunidades."
+          content="Descubra imóveis incríveis com o nosso Hero Carousel. Agio Imóveis."
         />
         <meta name="twitter:image" content="/images/og-image-carousel.jpg" />
       </Head>
