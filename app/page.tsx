@@ -13,8 +13,8 @@ import StatsSection from "@/components/ui/stats-section";
 import TestimonialsSection from "@/components/ui/testimonials-section";
 import Link from "next/link";
 import UltimasPropriedades from "@/components/ultimas-propriedades";
-// Certifique-se de que os arquivos abaixo existam em "@/components/"
 import FAQSection from "@/components/faq-section";
+import LocationSection from "@/components/location-section"; // Importa a seção de localização
 
 export default function Home() {
   return (
@@ -32,7 +32,10 @@ export default function Home() {
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.agiomoveis.com.br" />
         {/* Open Graph / Facebook */}
-        <meta property="og:title" content="Agio Imóveis - Encontre seu novo lar" />
+        <meta
+          property="og:title"
+          content="Agio Imóveis - Encontre seu novo lar"
+        />
         <meta
           property="og:description"
           content="Encontre as melhores oportunidades em imóveis para comprar ou alugar. Anuncie seu imóvel e alcance milhares de interessados."
@@ -42,14 +45,17 @@ export default function Home() {
         <meta property="og:image" content="/images/og-image.jpg" />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Agio Imóveis - Encontre seu novo lar" />
+        <meta
+          name="twitter:title"
+          content="Agio Imóveis - Encontre seu novo lar"
+        />
         <meta
           name="twitter:description"
           content="Encontre as melhores oportunidades em imóveis para comprar ou alugar."
         />
         <meta name="twitter:image" content="/images/og-image.jpg" />
       </Head>
-      
+
       <div className="min-h-screen">
         {/* Seção Hero com Carrossel e Filtros de Busca */}
         <section className="relative">
@@ -76,10 +82,15 @@ export default function Home() {
         {/* Últimas Propriedades */}
         <UltimasPropriedades />
 
+        {/* Seção de Localização */}
+        <LocationSection />
+
         {/* Perguntas Frequentes */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">Perguntas Frequentes</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center">
+              Perguntas Frequentes
+            </h2>
             <FAQSection />
           </div>
         </section>
@@ -87,9 +98,12 @@ export default function Home() {
         {/* Call-to-Action para Anunciar Imóvel */}
         <section className="py-16 bg-[#3EA76F]">
           <div className="container mx-auto px-4 text-center text-white">
-            <h2 className="text-3xl font-bold mb-4">Quer Anunciar Seu Imóvel?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Quer Anunciar Seu Imóvel?
+            </h2>
             <p className="text-xl mb-8">
-              Cadastre-se gratuitamente e alcance milhares de compradores interessados.
+              Cadastre-se gratuitamente e alcance milhares de compradores
+              interessados.
             </p>
             <Link href={`/anunciar`}>
               <Button size="lg" variant="secondary">
