@@ -51,7 +51,8 @@ export default function SearchPage() {
   const filterPriceRange = searchParams.get("priceRange") || "";
 
   const [properties, setProperties] = useState<Property[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 500000]);
+  // Alterado o valor máximo para 1.000.000 para incluir todos os imóveis
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [areaRange, setAreaRange] = useState([0, 5000]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
@@ -78,7 +79,8 @@ export default function SearchPage() {
     if (filters.type !== "all") count++;
     if (filters.bedrooms !== "any") count++;
     if (filters.bathrooms !== "any") count++;
-    if (priceRange[0] > 0 || priceRange[1] < 500000) count++;
+    // Atualizado para comparar com 1.000.000
+    if (priceRange[0] > 0 || priceRange[1] < 1000000) count++;
     if (areaRange[0] > 0 || areaRange[1] < 5000) count++;
     setActiveFilters(count);
   }, [filters, priceRange, areaRange]);
@@ -91,7 +93,7 @@ export default function SearchPage() {
       bathrooms: "any",
       sortBy: "recent",
     });
-    setPriceRange([0, 500000]);
+    setPriceRange([0, 1000000]); // Resetando para o novo valor máximo
     setAreaRange([0, 5000]);
     setCurrentPage(1);
   };
@@ -283,8 +285,9 @@ export default function SearchPage() {
                 R$ {priceRange[0].toLocaleString()} - R$ {priceRange[1].toLocaleString()}
               </span>
             </label>
+            {/* Alterado o max para 1.000.000 */}
             <Slider
-              max={500000}
+              max={1000000}
               step={10000}
               value={priceRange}
               onValueChange={setPriceRange}
