@@ -13,6 +13,8 @@ import StatsSection from "@/components/ui/stats-section";
 import TestimonialsSection from "@/components/ui/testimonials-section";
 import Link from "next/link";
 import UltimasPropriedades from "@/components/ultimas-propriedades";
+// Certifique-se de que os arquivos abaixo existam em "@/components/"
+import FAQSection from "@/components/faq-section";
 
 export default function Home() {
   return (
@@ -49,7 +51,7 @@ export default function Home() {
       </Head>
       
       <div className="min-h-screen">
-        {/* Hero Section */}
+        {/* Seção Hero com Carrossel e Filtros de Busca */}
         <section className="relative">
           <HeroCarousel />
           <div className="absolute left-0 right-0 bottom-32 z-10">
@@ -59,27 +61,35 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Estatísticas */}
         <StatsSection />
 
-        {/* Featured Properties */}
+        {/* Imóveis em Destaque */}
         <FeaturedProperties />
 
-        {/* How it Works */}
+        {/* Como Funciona */}
         <HowItWorks />
 
+        {/* Depoimentos */}
         <TestimonialsSection />
 
-        {/* Latest Properties */}
-       
+        {/* Últimas Propriedades */}
         <UltimasPropriedades />
-        
 
-        {/* CTA Section */}
+        {/* Perguntas Frequentes */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold mb-8 text-center">Perguntas Frequentes</h2>
+            <FAQSection />
+          </div>
+        </section>
+
+        {/* Call-to-Action para Anunciar Imóvel */}
         <section className="py-16 bg-[#3EA76F]">
           <div className="container mx-auto px-4 text-center text-white">
             <h2 className="text-3xl font-bold mb-4">Quer Anunciar Seu Imóvel?</h2>
             <p className="text-xl mb-8">
-              Cadastre-se gratuitamente e alcance milhares de compradores interessados
+              Cadastre-se gratuitamente e alcance milhares de compradores interessados.
             </p>
             <Link href={`/anunciar`}>
               <Button size="lg" variant="secondary">
