@@ -28,15 +28,17 @@ export default function FeaturedProperties() {
       try {
         const res = await fetch("https://agio-imoveis.onrender.com/api/imoveis");
         if (res.ok) {
-          const data = await res.json();
-          // Normaliza os dados e ordena do mais recente para o mais antigo
+          // Converte o resultado para um array do tipo Property
+          const data = (await res.json()) as Property[];
+
+          // Normaliza os dados, ordena do mais recente para o mais antigo e pega os 3 últimos imóveis
           const normalizedData = data
-            .map((property: Property) => ({
+            .map((property) => ({
               ...property,
               fotos: property.fotos || [],
             }))
-            .sort((a, b) => b.id - a.id) // Ordena por ID decrescente
-            .slice(0, 3); // Pega os 3 últimos imóveis
+            .sort((a: Property, b: Property) => b.id - a.id)
+            .slice(0, 3);
 
           setProperties(normalizedData);
         }
