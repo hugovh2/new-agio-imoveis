@@ -14,7 +14,8 @@ import TestimonialsSection from "@/components/ui/testimonials-section";
 import Link from "next/link";
 import UltimasPropriedades from "@/components/ultimas-propriedades";
 import FAQSection from "@/components/faq-section";
-import LocationSection from "@/components/location-section"; // Importa a seção de localização
+import LocationSection from "@/components/location-section";
+import PlanosSection from "@/components/nossos-planos";
 
 export default function Home() {
   return (
@@ -83,30 +84,54 @@ export default function Home() {
         {/* <UltimasPropriedades /> */}
 
         {/* Seção de Localização */}
-        <LocationSection />
-
-        {/* Perguntas Frequentes */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">
-              Perguntas Frequentes
+            <h2 className="text-4xl font-bold text-center mb-16">
+              Onde Atuamos
             </h2>
-            <FAQSection />
+            <LocationSection />
           </div>
         </section>
 
-        {/* Call-to-Action para Anunciar Imóvel */}
-        <section className="py-16 bg-[#3EA76F]">
-          <div className="container mx-auto px-4 text-center text-white">
-            <h2 className="text-3xl font-bold mb-4">
+        {/* FAQ Section with Improved Layout */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <h2 className="text-4xl font-bold text-center mb-16">
+              Perguntas Frequentes
+            </h2>
+            <div className="max-w-3xl mx-auto">
+              <FAQSection />
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Plans */}
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-4xl font-bold text-center mb-16">
+              Nossos Planos
+            </h2>
+            <PlanosSection />
+          </div>
+        </section>
+
+        {/* Enhanced CTA Section */}
+        <section className="py-20 bg-[#3EA76F] relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1973&q=80')] opacity-10" />
+          <div className="container mx-auto px-4 text-center text-white relative z-10">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Quer Anunciar Seu Imóvel?
             </h2>
-            <p className="text-xl mb-8">
+            <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
               Cadastre-se gratuitamente e alcance milhares de compradores
-              interessados.
+              interessados em todo o Brasil.
             </p>
-            <Link href={`/anunciar`}>
-              <Button size="lg" variant="secondary">
+            <Link href="/anunciar">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="text-lg px-8 py-6 hover:scale-105 transition-transform"
+              >
                 Anunciar Agora
               </Button>
             </Link>
