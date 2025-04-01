@@ -21,10 +21,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Agio Imóveis - Encontre seu novo lar</title>
+        <title>Ágio  Imóveis - Encontre seu novo lar</title>
         <meta
           name="description"
-          content="Agio Imóveis - Encontre as melhores oportunidades em imóveis para comprar ou alugar. Anuncie seu imóvel e alcance milhares de interessados."
+          content="Ágio  Imóveis - Encontre as melhores oportunidades em imóveis para comprar ou alugar. Anuncie seu imóvel e alcance milhares de interessados."
         />
         <meta
           name="keywords"
@@ -35,7 +35,7 @@ export default function Home() {
         {/* Open Graph / Facebook */}
         <meta
           property="og:title"
-          content="Agio Imóveis - Encontre seu novo lar"
+          content="Ágio  Imóveis - Encontre seu novo lar"
         />
         <meta
           property="og:description"
@@ -48,7 +48,7 @@ export default function Home() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="Agio Imóveis - Encontre seu novo lar"
+          content="Ágio  Imóveis - Encontre seu novo lar"
         />
         <meta
           name="twitter:description"
@@ -84,14 +84,14 @@ export default function Home() {
         {/* <UltimasPropriedades /> */}
 
         {/* Seção de Localização */}
-        <section className="py-20 bg-gray-50">
+        {/* <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center mb-16">
               Onde Atuamos
             </h2>
             <LocationSection />
           </div>
-        </section>
+        </section> */}
 
         {/* FAQ Section with Improved Layout */}
         <section className="py-20 bg-white">

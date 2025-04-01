@@ -11,7 +11,7 @@ const slides = [
   {
     image:
       "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-    title: "Agio Imóveis", // Título alterado
+    title: "Ágio  Imóveis", // Título alterado
     subtitle: "As melhores oportunidades de ágio em um só lugar",
   },
   {
@@ -62,10 +62,10 @@ export default function HeroCarousel() {
   return (
     <>
       <Head>
-        <title>Agio Imóveis - Carousel</title>
+        <title>Ágio  Imóveis - Carousel</title>
         <meta
           name="description"
-          content="Descubra imóveis incríveis com o nosso Hero Carousel. Agio Imóveis."
+          content="Descubra imóveis incríveis com o nosso Hero Carousel. Ágio  Imóveis."
         />
         <meta
           name="keywords"
@@ -74,20 +74,20 @@ export default function HeroCarousel() {
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.agiomoveis.com.br" />
         {/* Open Graph / Facebook */}
-        <meta property="og:title" content="Agio Imóveis - Carousel" />
+        <meta property="og:title" content="Ágio  Imóveis - Carousel" />
         <meta
           property="og:description"
-          content="Descubra imóveis incríveis com o nosso Hero Carousel. Agio Imóveis."
+          content="Descubra imóveis incríveis com o nosso Hero Carousel. Ágio  Imóveis."
         />
         <meta property="og:url" content="https://www.agiomoveis.com.br" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="/images/og-image-carousel.jpg" />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Agio Imóveis - Carousel" />
+        <meta name="twitter:title" content="Ágio  Imóveis - Carousel" />
         <meta
           name="twitter:description"
-          content="Descubra imóveis incríveis com o nosso Hero Carousel. Agio Imóveis."
+          content="Descubra imóveis incríveis com o nosso Hero Carousel. Ágio  Imóveis."
         />
         <meta name="twitter:image" content="/images/og-image-carousel.jpg" />
       </Head>

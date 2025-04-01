@@ -234,10 +234,10 @@ function App() {
   return (
     <>
       <Head>
-        <title>Agio Imóveis - Meu Perfil</title>
+        <title>Ágio  Imóveis - Meu Perfil</title>
         <meta
           name="description"
-          content="Gerencie seu perfil, atualize suas informações e veja suas estatísticas no Agio Imóveis."
+          content="Gerencie seu perfil, atualize suas informações e veja suas estatísticas no Ágio  Imóveis."
         />
         <meta
           name="keywords"
@@ -246,20 +246,20 @@ function App() {
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://www.agiomoveis.com.br/perfil" />
         {/* Open Graph */}
-        <meta property="og:title" content="Agio Imóveis - Meu Perfil" />
+        <meta property="og:title" content="Ágio  Imóveis - Meu Perfil" />
         <meta
           property="og:description"
-          content="Gerencie seu perfil, atualize suas informações e veja suas estatísticas no Agio Imóveis."
+          content="Gerencie seu perfil, atualize suas informações e veja suas estatísticas no Ágio  Imóveis."
         />
         <meta property="og:url" content="https://www.agiomoveis.com.br/perfil" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="/images/og-image-perfil.jpg" />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Agio Imóveis - Meu Perfil" />
+        <meta name="twitter:title" content="Ágio  Imóveis - Meu Perfil" />
         <meta
           name="twitter:description"
-          content="Gerencie seu perfil, atualize suas informações e veja suas estatísticas no Agio Imóveis."
+          content="Gerencie seu perfil, atualize suas informações e veja suas estatísticas no Ágio  Imóveis."
         />
         <meta name="twitter:image" content="/images/og-image-perfil.jpg" />
       </Head>
