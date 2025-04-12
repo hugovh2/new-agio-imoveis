@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Building2, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { randomAvatar } from '@/lib/utils';
@@ -20,26 +20,38 @@ export default function Header() {
     <header className="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-2xl font-bold text-[#3EA76F]">
-            Ágio Imóveis
-          </Link>
+          <a href="/" className="flex items-center space-x-2">
+            <Building2 className="h-8 w-8 text-[#3EA76F]" />
+            <span className="text-2xl font-bold text-gray-900">
+              Ágio<span className="text-[#3EA76F]">Imóveis</span>
+            </span>
+          </a>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/buscar" className="text-gray-600 hover:text-[#3EA76F]">
               Buscar Imóveis
             </Link>
-            <Link href="/anunciar" className="text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/anunciar"
+              className="text-gray-600 hover:text-[#3EA76F]"
+            >
               Anunciar
             </Link>
             <Link href="/sobre" className="text-gray-600 hover:text-[#3EA76F]">
               Sobre
             </Link>
-            <Link href="/contato" className="text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/contato"
+              className="text-gray-600 hover:text-[#3EA76F]"
+            >
               Contato
             </Link>
             {user && (
-              <Link href="/meus-imoveis" className="text-gray-600 hover:text-[#3EA76F]">
+              <Link
+                href="/meus-imoveis"
+                className="text-gray-600 hover:text-[#3EA76F]"
+              >
                 Meus Imóveis
               </Link>
             )}
@@ -64,7 +76,10 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <Button variant="ghost" onClick={() => router.push("/auth/login")}>
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push("/auth/login")}
+                >
                   Entrar
                 </Button>
                 <Button onClick={() => router.push("/auth/register")}>
@@ -75,7 +90,10 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             {isMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -85,20 +103,35 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden">
           <nav className="px-4 pt-2 pb-4 space-y-2">
-            <Link href="/buscar" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/buscar"
+              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
+            >
               Buscar Imóveis
             </Link>
-            <Link href="/anunciar" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/anunciar"
+              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
+            >
               Anunciar
             </Link>
-            <Link href="/sobre" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/sobre"
+              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
+            >
               Sobre
             </Link>
-            <Link href="/contato" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
+            <Link
+              href="/contato"
+              className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
+            >
               Contato
             </Link>
             {user && (
-              <Link href="/meus-imoveis" className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]">
+              <Link
+                href="/meus-imoveis"
+                className="block px-3 py-2 text-gray-600 hover:text-[#3EA76F]"
+              >
                 Meus Imóveis
               </Link>
             )}
@@ -121,10 +154,17 @@ export default function Header() {
                 </div>
               ) : (
                 <>
-                  <Button variant="ghost" className="w-full" onClick={() => router.push("/auth/login")}>
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => router.push("/auth/login")}
+                  >
                     Entrar
                   </Button>
-                  <Button className="w-full" onClick={() => router.push("/auth/register")}>
+                  <Button
+                    className="w-full"
+                    onClick={() => router.push("/auth/register")}
+                  >
                     Cadastrar
                   </Button>
                 </>
