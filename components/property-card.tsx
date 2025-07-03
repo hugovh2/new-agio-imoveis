@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, Heart, MapPin, Bed, Bath, Maximize, TrendingDown, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "./ui/card";
 
@@ -31,9 +32,6 @@ export default function PropertyCard({ property }: { property?: Property }) {
   const photos = property.fotos || [];
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Debug: verifique se as fotos estão corretas
-  console.log("Fotos recebidas:", photos);
-
   const nextImage = () => {
     if (photos.length > 0) {
       setCurrentImageIndex((prev) =>
@@ -50,86 +48,178 @@ export default function PropertyCard({ property }: { property?: Property }) {
     }
   };
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      maximumFractionDigits: 0
+    }).format(value);
+  };
+
+  const calculateSavings = () => {
+    return property.valor_total_financiado - property.valor_agio;
+  };
+
+  const getSavingsPercentage = () => {
+    return Math.round((calculateSavings() / property.valor_total_financiado) * 100);
+  };
+
   return (
-    <Card className="overflow-hidden group">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -5 }}
+      className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100"
+    >
       <div className="relative">
         {photos.length > 0 ? (
-          <Image
-            src={photos[currentImageIndex]} // Usa a URL completa do Cloudinary
-            alt={property.tipo_imovel}
-            width={400}
-            height={300}
-            className="w-full h-[200px] object-cover transition-transform group-hover:scale-105"
-          />
+          <div className="relative h-64 overflow-hidden">
+            <Image
+              src={photos[currentImageIndex]}
+              alt={property.tipo_imovel}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            
+            {/* Overlay gradiente */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            
+            {/* Badge de economia */}
+            <div className="absolute top-4 left-4">
+              <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center">
+                <TrendingDown className="w-4 h-4 mr-1" />
+                {getSavingsPercentage()}% OFF
+              </div>
+            </div>
+
+            {/* Tipo de imóvel */}
+            <div className="absolute top-4 right-4">
+              <span className="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                {property.tipo_imovel}
+              </span>
+            </div>
+
+            {/* Navegação de imagens */}
+            {photos.length > 1 && (
+              <>
+                <button
+                  onClick={previousImage}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                >
+                  <ChevronLeft className="w-4 h-4 text-gray-700" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                >
+                  <ChevronRight className="w-4 h-4 text-gray-700" />
+                </button>
+
+                {/* Indicadores */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                  {photos.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentImageIndex ? "bg-white" : "bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Botão de favorito */}
+            <button
+              onClick={() => setIsFavorite(!isFavorite)}
+              className="absolute top-4 right-16 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-all"
+            >
+              <Heart
+                className={`w-5 h-5 transition-colors ${
+                  isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"
+                }`}
+              />
+            </button>
+          </div>
         ) : (
-          <Image
-            src="/default-image.jpg"
-            alt="Imagem padrão"
-            width={400}
-            height={300}
-            className="w-full h-[200px] object-cover transition-transform group-hover:scale-105"
-          />
+          <div className="h-64 bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-500">Sem imagem disponível</span>
+          </div>
         )}
-
-        {photos.length > 1 && (
-          <>
-            <button
-              onClick={previousImage}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-700" />
-            </button>
-            <button
-              onClick={nextImage}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full"
-            >
-              <ChevronRight className="w-5 h-5 text-gray-700" />
-            </button>
-          </>
-        )}
-
-        <button
-          onClick={() => setIsFavorite(!isFavorite)}
-          className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg"
-        >
-          <Heart
-            className={`w-5 h-5 ${
-              isFavorite ? "fill-red-500 text-red-500" : "text-gray-500"
-            }`}
-          />
-        </button>
       </div>
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-[#3EA76F]">
-            {property.tipo_imovel}
-          </span>
-          <span className="text-sm text-gray-500">{property.endereco}</span>
+
+      <div className="p-6">
+        {/* Localização */}
+        <div className="flex items-center text-gray-600 mb-3">
+          <MapPin className="w-4 h-4 mr-2" />
+          <span className="text-sm">{property.cidade}</span>
         </div>
-        <h3 className="text-lg font-semibold mb-2">{property.cidade}</h3>
-        <div className="flex items-center justify-between mb-4">
-          <div>
+
+        {/* Título */}
+        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+          {property.endereco}
+        </h3>
+
+        {/* Características */}
+        <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+          <div className="flex items-center">
+            <Bed className="w-4 h-4 mr-1" />
+            <span>{property.quartos} quartos</span>
+          </div>
+          <div className="flex items-center">
+            <Bath className="w-4 h-4 mr-1" />
+            <span>{property.banheiros} banheiros</span>
+          </div>
+          <div className="flex items-center">
+            <Maximize className="w-4 h-4 mr-1" />
+            <span>{property.area} m²</span>
+          </div>
+        </div>
+
+        {/* Informações financeiras */}
+        <div className="space-y-3 mb-6">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Valor do Ágio:</span>
             <span className="text-2xl font-bold text-[#3EA76F]">
-              R$ {property.valor_agio.toLocaleString()}
-            </span>
-            <span className="text-sm text-gray-500 block">Valor do ágio</span>
-          </div>
-          <div className="text-right">
-            <span className="text-sm text-gray-500 block">Parcela atual</span>
-            <span className="font-semibold">
-              R$ {property.valor_parcela_atual.toLocaleString()}/mês
+              {formatCurrency(property.valor_agio)}
             </span>
           </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Parcela Mensal:</span>
+            <span className="text-lg font-semibold text-gray-900">
+              {formatCurrency(property.valor_parcela_atual)}
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Parcelas Restantes:</span>
+            <div className="flex items-center">
+              <Clock className="w-4 h-4 mr-1 text-gray-400" />
+              <span className="text-sm font-medium">{property.parcelas_restantes} meses</span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-          <span>{property.quartos} quartos</span>
-          <span>{property.banheiros} banheiros</span>
-          <span>{property.area} m²</span>
+
+        {/* Economia */}
+        <div className="bg-green-50 rounded-lg p-3 mb-4">
+          <div className="text-center">
+            <p className="text-sm text-green-700 mb-1">Economia Total</p>
+            <p className="text-xl font-bold text-green-800">
+              {formatCurrency(calculateSavings())}
+            </p>
+          </div>
         </div>
+
+        {/* Botão */}
         <Link href={`/detalhes-imoveis`}>
-          <Button className="w-full">Ver Detalhes</Button>
+          <Button className="w-full bg-[#3EA76F] hover:bg-[#48C78E] transition-all duration-300 text-lg py-3">
+            Ver Detalhes
+          </Button>
         </Link>
       </div>
-    </Card>
+    </motion.div>
   );
 }
