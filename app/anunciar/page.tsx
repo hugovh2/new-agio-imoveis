@@ -40,6 +40,7 @@ interface FormData {
   cidade: string;
   fotos: File[];
   valor_total_imovel: string;
+  valor_total_financiado: string;
   valor_agio: string;
   saldo_devedor: string;
   valor_parcela_atual: string;
@@ -114,6 +115,7 @@ export default function AnunciarPage() {
     cidade: "",
     fotos: [],
     valor_total_imovel: "",
+    valor_total_financiado: "",
     valor_agio: "",
     saldo_devedor: "",
     valor_parcela_atual: "",
@@ -263,13 +265,13 @@ export default function AnunciarPage() {
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
       case 1:
-        if (!formData.tipo_imovel || !formData.area || !formData.quartos || !formData.banheiros || !formData.descricao) {
+        if (!formData.tipo_imovel || !formData.area || !formData.quartos || !formData.banheiros || !formData.descricao || !formData.estado) {
           toast.error('Preencha todos os campos obrigatórios');
           return false;
         }
         break;
       case 2:
-        if (!formData.valor_total_imovel || !formData.valor_agio || !formData.valor_parcela_atual || !formData.parcelas_restantes) {
+        if (!formData.valor_total_imovel || !formData.valor_total_financiado || !formData.valor_agio || !formData.valor_parcela_atual || !formData.parcelas_restantes) {
           toast.error('Preencha todos os valores financeiros');
           return false;
         }
@@ -506,6 +508,47 @@ export default function AnunciarPage() {
                           className="h-12"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Estado *
+                        </label>
+                        <select
+                          name="estado"
+                          value={formData.estado}
+                          onChange={handleInputChange}
+                          className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-[#3EA76F] focus:border-transparent"
+                        >
+                          <option value="">Selecione o estado</option>
+                          <option value="AC">Acre</option>
+                          <option value="AL">Alagoas</option>
+                          <option value="AP">Amapá</option>
+                          <option value="AM">Amazonas</option>
+                          <option value="BA">Bahia</option>
+                          <option value="CE">Ceará</option>
+                          <option value="DF">Distrito Federal</option>
+                          <option value="ES">Espírito Santo</option>
+                          <option value="GO">Goiás</option>
+                          <option value="MA">Maranhão</option>
+                          <option value="MT">Mato Grosso</option>
+                          <option value="MS">Mato Grosso do Sul</option>
+                          <option value="MG">Minas Gerais</option>
+                          <option value="PA">Pará</option>
+                          <option value="PB">Paraíba</option>
+                          <option value="PR">Paraná</option>
+                          <option value="PE">Pernambuco</option>
+                          <option value="PI">Piauí</option>
+                          <option value="RJ">Rio de Janeiro</option>
+                          <option value="RN">Rio Grande do Norte</option>
+                          <option value="RS">Rio Grande do Sul</option>
+                          <option value="RO">Rondônia</option>
+                          <option value="RR">Roraima</option>
+                          <option value="SC">Santa Catarina</option>
+                          <option value="SP">São Paulo</option>
+                          <option value="SE">Sergipe</option>
+                          <option value="TO">Tocantins</option>
+                        </select>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -615,6 +658,24 @@ export default function AnunciarPage() {
                           onBlur={(e) => {
                             const formatted = formatCurrency(e.target.value);
                             setFormData((prev) => ({ ...prev, valor_total_imovel: formatted }));
+                          }}
+                          className="h-12"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Valor Total Financiado *
+                        </label>
+                        <Input
+                          name="valor_total_financiado"
+                          type="text"
+                          placeholder="R$ 0,00"
+                          value={formData.valor_total_financiado}
+                          onChange={handleInputChange}
+                          onBlur={(e) => {
+                            const formatted = formatCurrency(e.target.value);
+                            setFormData((prev) => ({ ...prev, valor_total_financiado: formatted }));
                           }}
                           className="h-12"
                         />
@@ -799,11 +860,17 @@ export default function AnunciarPage() {
                                 setDraggedIndex(null);
                               }}
                             >
-                              <img
-                                src={URL.createObjectURL(file)}
-                                alt={`Preview ${index + 1}`}
-                                className="w-full h-full object-cover"
-                              />
+                              {file instanceof File ? (
+                                <img
+                                  src={URL.createObjectURL(file)}
+                                  alt={`Preview ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-xs">
+                                  Imagem não disponível
+                                </div>
+                              )}
                               
                               {index === 0 && (
                                 <div className="absolute top-2 left-2 bg-[#3EA76F] text-white px-2 py-1 rounded text-xs font-medium">
