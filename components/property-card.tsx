@@ -73,83 +73,84 @@ export default function PropertyCard({ property }: { property?: Property }) {
       whileHover={{ y: -5 }}
       className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100"
     >
-      <div className="relative">
-        {photos.length > 0 ? (
-          <div className="relative h-64 overflow-hidden">
-            <Image
-              src={photos[currentImageIndex]}
-              alt={property.tipo_imovel}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-            
-            {/* Overlay gradiente */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-            
-            {/* Badge de economia */}
-            <div className="absolute top-4 left-4">
-              <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center">
-                <TrendingDown className="w-4 h-4 mr-1" />
-                {getSavingsPercentage()}% OFF
-              </div>
-            </div>
-
-            {/* Tipo de imóvel */}
-            <div className="absolute top-4 right-4">
-              <span className="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                {property.tipo_imovel}
-              </span>
-            </div>
-
-            {/* Navegação de imagens */}
-            {photos.length > 1 && (
-              <>
-                <button
-                  onClick={previousImage}
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <ChevronLeft className="w-4 h-4 text-gray-700" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <ChevronRight className="w-4 h-4 text-gray-700" />
-                </button>
-
-                {/* Indicadores */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1">
-                  {photos.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        index === currentImageIndex ? "bg-white" : "bg-white/50"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Botão de favorito */}
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className="absolute top-4 right-16 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-all"
-            >
-              <Heart
-                className={`w-5 h-5 transition-colors ${
-                  isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"
-                }`}
+      <Link href={`/imovel/${property.id}`} passHref>
+        <div className="relative cursor-pointer">
+          {photos.length > 0 ? (
+            <div className="relative h-64 overflow-hidden">
+              <Image
+                src={photos[currentImageIndex]}
+                alt={property.tipo_imovel}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-            </button>
-          </div>
-        ) : (
-          <div className="h-64 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">Sem imagem disponível</span>
-          </div>
-        )}
-      </div>
+              
+              {/* Overlay gradiente */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              
+              {/* Badge de economia */}
+              <div className="absolute top-4 left-4">
+                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center">
+                  <TrendingDown className="w-4 h-4 mr-1" />
+                  {getSavingsPercentage()}% OFF
+                </div>
+              </div>
 
+              {/* Tipo de imóvel */}
+              <div className="absolute top-4 right-4">
+                <span className="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                  {property.tipo_imovel}
+                </span>
+              </div>
+
+              {/* Navegação de imagens */}
+              {photos.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => { e.preventDefault(); previousImage(); }}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-gray-700" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.preventDefault(); nextImage(); }}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <ChevronRight className="w-4 h-4 text-gray-700" />
+                  </button>
+
+                  {/* Indicadores */}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                    {photos.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          index === currentImageIndex ? "bg-white" : "bg-white/50"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Botão de favorito */}
+              <button
+                onClick={(e) => { e.preventDefault(); setIsFavorite(!isFavorite); }}
+                className="absolute top-4 right-16 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-all"
+              >
+                <Heart
+                  className={`w-5 h-5 transition-colors ${
+                    isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"
+                  }`}
+                />
+              </button>
+            </div>
+          ) : (
+            <div className="h-64 bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-500">Sem imagem disponível</span>
+            </div>
+          )}
+        </div>
+      </Link>
       <div className="p-6">
         {/* Localização */}
         <div className="flex items-center text-gray-600 mb-3">
@@ -214,7 +215,7 @@ export default function PropertyCard({ property }: { property?: Property }) {
         </div>
 
         {/* Botão */}
-        <Link href={`/detalhes-imoveis`}>
+        <Link href={`/imovel/${property.id}`}>
           <Button className="w-full bg-[#3EA76F] hover:bg-[#48C78E] transition-all duration-300 text-lg py-3">
             Ver Detalhes
           </Button>

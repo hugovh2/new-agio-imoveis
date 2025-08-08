@@ -39,30 +39,34 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
+import EditPropertyModal from '../../components/EditPropertyModal';
 import { Input } from '@/components/ui/input';
 
 interface Property {
-  estado: string;
   id: number;
   usuario_id: number;
   tipo_imovel: string;
+  cep: string;
+  endereco: string;
+  complemento?: string | null;
+  cidade: string;
+  estado: string;
+  bairro: string;
   area: number;
   quartos: number;
   banheiros: number;
-  endereco: string;
-  cidade: string;
-  cep: string;
+  garagem: number;
   descricao: string;
   fotos: string[] | null;
   valor_agio: number;
   valor_parcela_atual: number;
   parcelas_restantes: number;
   valor_total_financiado: number;
+  status?: 'ativo' | 'pausado' | 'vendido';
+  created_at?: string;
   views?: number;
   favorites?: number;
   messages?: number;
-  status?: 'ativo' | 'pausado' | 'vendido';
-  created_at?: string;
 }
 
 interface DashboardStats {
@@ -508,17 +512,15 @@ export default function MeusImoveisPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        // Add mock data for demo
         const enrichedData = data.map((property: Property) => ({
           ...property,
           views: Math.floor(Math.random() * 500) + 50,
           favorites: Math.floor(Math.random() * 50) + 5,
           messages: Math.floor(Math.random() * 20) + 1,
-          status: ['ativo', 'pausado', 'vendido'][Math.floor(Math.random() * 3)] as 'ativo' | 'pausado' | 'vendido'
+          status: property.status || (['ativo', 'pausado', 'vendido'][Math.floor(Math.random() * 3)] as 'ativo' | 'pausado' | 'vendido')
         }));
         setProperties(enrichedData);
-        
-        // Calculate dashboard stats
+
         const stats = {
           totalProperties: enrichedData.length,
           totalViews: enrichedData.reduce((sum: number, p: Property) => sum + (p.views || 0), 0),
@@ -549,10 +551,10 @@ export default function MeusImoveisPage() {
         property.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
         property.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
         property.endereco.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesType = propertyType === 'all' || property.tipo_imovel.toLowerCase() === propertyType.toLowerCase();
       const matchesStatus = statusFilter === 'all' || property.status === statusFilter;
-      
+
       return matchesSearch && matchesType && matchesStatus;
     });
   }, [properties, searchTerm, propertyType, statusFilter]);
@@ -588,7 +590,7 @@ export default function MeusImoveisPage() {
 
   const handleDelete = useCallback(async (id: number) => {
     if (!window.confirm('Tem certeza que deseja excluir este imóvel?')) return;
-    
+
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`https://agio-imoveis.onrender.com/api/imoveis/${id}`, {
@@ -610,8 +612,8 @@ export default function MeusImoveisPage() {
   }, []);
 
   const handleToggleStatus = useCallback((id: number) => {
-    setProperties(prev => prev.map(property => 
-      property.id === id 
+    setProperties(prev => prev.map(property =>
+      property.id === id
         ? { ...property, status: property.status === 'ativo' ? 'pausado' : 'ativo' as 'ativo' | 'pausado' | 'vendido' }
         : property
     ));
@@ -621,6 +623,45 @@ export default function MeusImoveisPage() {
   const handleBoost = useCallback((id: number) => {
     toast.info('Funcionalidade de impulsionamento em desenvolvimento!');
   }, []);
+
+  const handleUpdateProperty = useCallback(async (formData: FormData) => {
+        if (!editingProperty) return;
+
+    // Adiciona o método PUT para o Laravel entender a requisição
+    formData.append('_method', 'PUT');
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Você não está autenticado.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://agio-imoveis.onrender.com/api/imoveis/${editingProperty.id}`, {
+        method: 'POST', // Usar POST para enviar FormData com arquivos
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json', // Garante que a resposta de erro seja JSON
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Falha ao atualizar o imóvel');
+      }
+
+      setProperties(properties => properties.map(p => p.id === result.imovel.id ? result.imovel : p));
+
+      setEditingProperty(null);
+      toast.success(result.message || 'Imóvel atualizado com sucesso!');
+
+    } catch (error: any) {
+      console.error('Erro ao atualizar o imóvel:', error);
+      toast.error(error.message || 'Erro ao atualizar o imóvel. Tente novamente.');
+    }
+  }, [editingProperty, properties]);
 
   if (isLoading) {
     return (
@@ -635,7 +676,16 @@ export default function MeusImoveisPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
-      {/* Header */}
+      <ToastContainer position="bottom-right" autoClose={3000} />
+      <AnimatePresence>
+        {editingProperty && (
+          <EditPropertyModal
+            property={editingProperty}
+            onClose={() => setEditingProperty(null)}
+            onSave={handleUpdateProperty}
+          />
+        )}
+      </AnimatePresence>
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -661,7 +711,6 @@ export default function MeusImoveisPage() {
         </div>
       </div>
 
-      {/* Dashboard Stats */}
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <motion.div
@@ -754,7 +803,6 @@ export default function MeusImoveisPage() {
           </motion.div>
         </div>
 
-        {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
