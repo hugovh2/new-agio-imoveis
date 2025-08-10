@@ -73,8 +73,8 @@ export default function PropertyCard({ property }: { property?: Property }) {
       whileHover={{ y: -5 }}
       className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100"
     >
-      <Link href={`/imovel/${property.id}`} passHref>
-        <div className="relative cursor-pointer">
+      <div className="relative cursor-pointer">
+        <Link href={`/imovel/${property.id}`}>
           {photos.length > 0 ? (
             <div className="relative h-64 overflow-hidden">
               <Image
@@ -149,8 +149,8 @@ export default function PropertyCard({ property }: { property?: Property }) {
               <span className="text-gray-500">Sem imagem disponível</span>
             </div>
           )}
-        </div>
-      </Link>
+        </Link>
+      </div>
       <div className="p-6">
         {/* Localização */}
         <div className="flex items-center text-gray-600 mb-3">
