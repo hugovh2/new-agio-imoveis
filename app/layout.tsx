@@ -1,4 +1,5 @@
 import "./globals.css";
+import SessionTimeout from '../components/SessionTimeout';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="light">
+            <SessionTimeout />
             <Header />
             <main>{children}</main>
             <WhatsAppButton />
