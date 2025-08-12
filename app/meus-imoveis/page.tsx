@@ -40,6 +40,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import EditPropertyModal from '../../components/EditPropertyModal';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import { Input } from '@/components/ui/input';
 
 interface Property {
@@ -489,6 +490,8 @@ export default function MeusImoveisPage() {
   const [sortBy, setSortBy] = useState<'recent' | 'views' | 'price-asc' | 'price-desc'>('recent');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [deletingProperty, setDeletingProperty] = useState<Property | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
@@ -588,9 +591,16 @@ export default function MeusImoveisPage() {
     setEditingProperty(property);
   }, []);
 
-  const handleDelete = useCallback(async (id: number) => {
-    if (!window.confirm('Tem certeza que deseja excluir este imóvel?')) return;
+  const handleDelete = useCallback((id: number) => {
+    const property = properties.find(p => p.id === id);
+    if (property) {
+      setDeletingProperty(property);
+    }
+  }, [properties]);
 
+  const handleConfirmDelete = useCallback(async (id: number) => {
+    setIsDeleting(true);
+    
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`https://agio-imoveis.onrender.com/api/imoveis/${id}`, {
@@ -602,12 +612,15 @@ export default function MeusImoveisPage() {
       if (res.ok) {
         setProperties((prev) => prev.filter((property) => property.id !== id));
         toast.success('Imóvel excluído com sucesso!');
+        setDeletingProperty(null);
       } else {
         toast.error('Erro ao excluir o imóvel.');
       }
     } catch (error) {
       console.error('Erro ao excluir o imóvel:', error);
       toast.error('Erro ao excluir o imóvel.');
+    } finally {
+      setIsDeleting(false);
     }
   }, []);
 
@@ -686,6 +699,14 @@ export default function MeusImoveisPage() {
           />
         )}
       </AnimatePresence>
+      
+      <DeleteConfirmationModal
+        isOpen={!!deletingProperty}
+        property={deletingProperty}
+        onClose={() => setDeletingProperty(null)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+      />
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
