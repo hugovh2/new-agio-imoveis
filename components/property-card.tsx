@@ -74,7 +74,7 @@ export default function PropertyCard({ property }: { property?: Property }) {
       className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100"
     >
       <div className="relative cursor-pointer">
-        <Link href={`/imovel/${property.id}`}>
+        <Link href={`/detalhes-imoveis?id=${property.id}`}>
           {photos.length > 0 ? (
             <div className="relative h-64 overflow-hidden">
               <Image
