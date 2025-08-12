@@ -285,6 +285,18 @@ function PropertyCard({
     >
       {/* Image Gallery */}
       <div className="relative h-48">
+        {/* Badge de status */}
+        {property.status && (
+          <span
+            className={`absolute top-2 left-2 px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(property.status)}`}
+            style={{ zIndex: 2 }}
+          >
+            {property.status === 'ativo' && 'Ativo'}
+            {property.status === 'pausado' && 'Pausado'}
+            {property.status === 'vendido' && 'Vendido'}
+          </span>
+        )}
+
         {isLoading && (
           <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
             <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
@@ -624,14 +636,36 @@ export default function MeusImoveisPage() {
     }
   }, []);
 
-  const handleToggleStatus = useCallback((id: number) => {
-    setProperties(prev => prev.map(property =>
-      property.id === id
-        ? { ...property, status: property.status === 'ativo' ? 'pausado' : 'ativo' as 'ativo' | 'pausado' | 'vendido' }
-        : property
-    ));
-    toast.success('Status atualizado com sucesso!');
-  }, []);
+  const handleToggleStatus = useCallback(async (id: number) => {
+    const property = properties.find(p => p.id === id);
+    if (!property) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Você não está autenticado.');
+      return;
+    }
+    const newStatus = property.status === 'ativo' ? 'pausado' : 'ativo';
+    try {
+      const response = await fetch(`https://agio-imoveis.onrender.com/api/imoveis/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar status');
+      }
+      setProperties(prev => prev.map(property =>
+        property.id === id ? { ...property, status: newStatus } : property
+      ));
+      toast.success('Status atualizado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao atualizar status do imóvel.');
+    }
+  }, [properties]);
 
   const handleBoost = useCallback((id: number) => {
     toast.info('Funcionalidade de impulsionamento em desenvolvimento!');
