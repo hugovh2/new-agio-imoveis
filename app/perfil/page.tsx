@@ -18,6 +18,7 @@ import {
   MapPin,
   Briefcase,
   Loader2,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -362,36 +363,41 @@ function App() {
                 <ul className="space-y-2">
                   {[
                     {
+                      href: "/perfil",
                       name: "Visão Geral",
                       icon: <User className="h-5 w-5 mr-3 text-[#3EA76F]" />,
                     },
                     {
+                      href: "/meus-imoveis",
                       name: "Meus Imóveis",
                       icon: <MapPin className="h-5 w-5 mr-3 text-[#3EA76F]" />,
                     },
                     {
+                      href: "/perfil/mensagens",
                       name: "Mensagens",
                       icon: (
                         <MessageSquare className="h-5 w-5 mr-3 text-[#3EA76F]" />
                       ),
                     },
                     {
+                      href: "/perfil/calendario",
                       name: "Calendário",
                       icon: <Calendar className="h-5 w-5 mr-3 text-[#3EA76F]" />,
                     },
                     {
+                      href: "/perfil/configuracoes",
                       name: "Configurações",
-                      icon: <Briefcase className="h-5 w-5 mr-3 text-[#3EA76F]" />,
+                      icon: <Settings className="h-5 w-5 mr-3 text-[#3EA76F]" />,
                     },
                   ].map((item) => (
                     <li key={item.name}>
-                      <button className="w-full p-3 flex items-center justify-between rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="flex items-center">
-                          {item.icon}
-                          <span className="text-gray-700">{item.name}</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
-                      </button>
+                      <Link href={item.href || "#"} className="w-full p-3 flex items-center justify-between rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center">
+                            {item.icon}
+                            <span className="text-gray-700">{item.name}</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                      </Link>
                     </li>
                   ))}
                 </ul>
