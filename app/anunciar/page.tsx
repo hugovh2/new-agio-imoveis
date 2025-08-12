@@ -22,7 +22,8 @@ import {
   Image as ImageIcon,
   Eye,
   X,
-  GripVertical
+  GripVertical,
+  Car
 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -32,10 +33,12 @@ interface FormData {
   area: string;
   quartos: string;
   banheiros: string;
+  garagem: string; // Campo adicionado
   descricao: string;
   cep: string;
   endereco: string;
   complemento: string;
+  bairro: string; // Campo adicionado
   estado: string;
   cidade: string;
   fotos: File[];
@@ -107,10 +110,12 @@ export default function AnunciarPage() {
     area: "",
     quartos: "",
     banheiros: "",
+    garagem: "0", // Campo inicializado
     descricao: "",
     cep: "",
     endereco: "",
     complemento: "",
+    bairro: "", // Campo inicializado
     estado: "",
     cidade: "",
     fotos: [],
@@ -129,7 +134,10 @@ export default function AnunciarPage() {
     const autoSave = setTimeout(() => {
       if (step > 1) {
         setAutoSaveStatus('saving');
-        localStorage.setItem('anuncio_rascunho', JSON.stringify(formData));
+        // Salvamos apenas os dados serializáveis (sem files)
+        const serializableData = { ...formData };
+        delete serializableData.fotos; // Remove files para serialização
+        localStorage.setItem('anuncio_rascunho', JSON.stringify(serializableData));
         setTimeout(() => setAutoSaveStatus('saved'), 1000);
       }
     }, 2000);
@@ -143,7 +151,7 @@ export default function AnunciarPage() {
     if (draft) {
       try {
         const parsedDraft = JSON.parse(draft);
-        setFormData(parsedDraft);
+        setFormData(prev => ({ ...prev, ...parsedDraft, fotos: [] })); // Mantém fotos vazias
         toast.info('Rascunho carregado automaticamente');
       } catch (error) {
         console.error('Erro ao carregar rascunho:', error);
@@ -191,6 +199,7 @@ export default function AnunciarPage() {
           setFormData((prev) => ({
             ...prev,
             endereco: data.logradouro || "",
+            bairro: data.bairro || "", // Campo bairro preenchido automaticamente
             complemento: data.complemento || "",
             cidade: data.localidade || "",
             estado: data.uf || "",
@@ -215,17 +224,24 @@ export default function AnunciarPage() {
           toast.error(`${file.name} não é uma imagem válida`);
           return false;
         }
-        if (file.size > 5 * 1024 * 1024) {
-          toast.error(`${file.name} é muito grande (máximo 5MB)`);
+        if (file.size > 10 * 1024 * 1024) { // Aumentado para 10MB
+          toast.error(`${file.name} é muito grande (máximo 10MB)`);
           return false;
         }
         return true;
       });
 
+      if (validFiles.length === 0) {
+        toast.error("Nenhuma imagem válida foi selecionada");
+        return;
+      }
+
       setFormData((prev) => ({ 
         ...prev, 
         fotos: [...prev.fotos, ...validFiles].slice(0, 20) // Limit to 20 photos
       }));
+      
+      toast.success(`${validFiles.length} foto(s) adicionada(s) com sucesso`);
     }
   };
 
@@ -265,13 +281,18 @@ export default function AnunciarPage() {
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
       case 1:
-        if (!formData.tipo_imovel || !formData.area || !formData.quartos || !formData.banheiros || !formData.descricao || !formData.estado) {
+        if (!formData.tipo_imovel || !formData.area || !formData.quartos || 
+            !formData.banheiros || !formData.descricao || !formData.estado || 
+            !formData.cep || !formData.endereco || !formData.bairro || 
+            !formData.cidade || formData.garagem === '') {
           toast.error('Preencha todos os campos obrigatórios');
           return false;
         }
         break;
       case 2:
-        if (!formData.valor_total_imovel || !formData.valor_total_financiado || !formData.valor_agio || !formData.valor_parcela_atual || !formData.parcelas_restantes) {
+        if (!formData.valor_total_imovel || !formData.valor_total_financiado || 
+            !formData.valor_agio || !formData.valor_parcela_atual || 
+            !formData.parcelas_restantes) {
           toast.error('Preencha todos os valores financeiros');
           return false;
         }
@@ -307,7 +328,11 @@ export default function AnunciarPage() {
       // Add all form fields
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'fotos') {
-          formData.fotos.forEach((file) => {
+          if (formData.fotos.length === 0) {
+            toast.error("Adicione pelo menos uma foto do imóvel");
+            throw new Error("Fotos são obrigatórias");
+          }
+          formData.fotos.forEach((file, index) => {
             data.append("fotos[]", file);
           });
         } else if (key === 'documentacao') {
@@ -326,13 +351,23 @@ export default function AnunciarPage() {
         body: data,
       });
 
+      const responseData = await response.json();
+
       if (response.ok) {
         toast.success("Anúncio publicado com sucesso!");
         localStorage.removeItem('anuncio_rascunho');
         router.push("/meus-imoveis");
       } else {
-        const errorData = await response.json();
-        toast.error("Erro: " + errorData.message);
+        console.error("Erro no servidor:", responseData);
+        if (responseData.errors) {
+          Object.keys(responseData.errors).forEach(field => {
+            responseData.errors[field].forEach((error: string) => {
+              toast.error(`${field}: ${error}`);
+            });
+          });
+        } else {
+          toast.error("Erro: " + (responseData.message || "Erro desconhecido"));
+        }
       }
     } catch (error) {
       console.error("Erro ao enviar anúncio:", error);
@@ -509,6 +544,23 @@ export default function AnunciarPage() {
                         />
                       </div>
 
+                      {/* Campo Garagem Adicionado */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Car className="w-4 h-4 inline mr-1" />
+                          Vagas de Garagem *
+                        </label>
+                        <Input
+                          name="garagem"
+                          type="number"
+                          min="0"
+                          placeholder="Ex: 1"
+                          value={formData.garagem}
+                          onChange={handleInputChange}
+                          className="h-12"
+                        />
+                      </div>
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Estado *
@@ -581,6 +633,35 @@ export default function AnunciarPage() {
                         />
                       </div>
 
+                      {/* Campo Bairro Adicionado */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Bairro *
+                        </label>
+                        <Input
+                          name="bairro"
+                          type="text"
+                          placeholder="Nome do bairro"
+                          value={formData.bairro}
+                          onChange={handleInputChange}
+                          className="h-12"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Complemento
+                        </label>
+                        <Input
+                          name="complemento"
+                          type="text"
+                          placeholder="Apto, casa, etc."
+                          value={formData.complemento}
+                          onChange={handleInputChange}
+                          className="h-12"
+                        />
+                      </div>
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Endereço Completo *
@@ -588,7 +669,7 @@ export default function AnunciarPage() {
                         <Input
                           name="endereco"
                           type="text"
-                          placeholder="Logradouro, número, bairro"
+                          placeholder="Logradouro e número"
                           value={formData.endereco}
                           onChange={handleInputChange}
                           className="h-12"
