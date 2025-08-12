@@ -48,7 +48,14 @@ export default function DetalhesImovelPage() {
     const fetchImovel = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/imoveis/${id}`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/imoveis/${id}`, {
+          credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
         
         if (!response.ok) {
           throw new Error(`Erro ${response.status}: Imóvel não encontrado`);
