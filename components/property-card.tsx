@@ -215,7 +215,7 @@ export default function PropertyCard({ property }: { property?: Property }) {
         </div>
 
         {/* Botão */}
-        <Link href={`/imovel/${property.id}`}>
+        <Link href={`/detalhes-imoveis?id=${property.id}`}>
           <Button className="w-full bg-[#3EA76F] hover:bg-[#48C78E] transition-all duration-300 text-lg py-3">
             Ver Detalhes
           </Button>
