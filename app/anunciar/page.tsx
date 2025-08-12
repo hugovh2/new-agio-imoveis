@@ -844,7 +844,7 @@ export default function AnunciarPage() {
                       </div>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-3">
                         Documentação Disponível
                       </label>
@@ -873,7 +873,7 @@ export default function AnunciarPage() {
                           </label>
                         ))}
                       </div>
-                    </div>
+                    </div> */}
                   </motion.div>
                 )}
 
