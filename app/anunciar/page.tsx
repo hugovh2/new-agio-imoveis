@@ -135,8 +135,7 @@ export default function AnunciarPage() {
       if (step > 1) {
         setAutoSaveStatus('saving');
         // Salvamos apenas os dados serializáveis (sem files)
-        const serializableData = { ...formData };
-        delete serializableData.fotos; // Remove files para serialização
+        const { fotos, ...serializableData } = formData; // Remove 'fotos' usando desestruturação
         localStorage.setItem('anuncio_rascunho', JSON.stringify(serializableData));
         setTimeout(() => setAutoSaveStatus('saved'), 1000);
       }
